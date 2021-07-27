@@ -5,7 +5,17 @@ const gradient = {
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
-const TaskGroup = () => {
+const TaskGroup = ({
+  name,
+  total,
+  running,
+  stopped,
+}: {
+  name: string;
+  total: number;
+  running: number;
+  stopped: number;
+}) => {
   return (
     <>
       <div
@@ -13,12 +23,12 @@ const TaskGroup = () => {
         style={gradient}
       >
         <div className='font-semibold text-md'>
-          Da group
+          {name}
           <div
             className='text-sm font-medium mt-1'
             style={{ color: "#6F6B75" }}
           >
-            69 Tasks
+            {total} Tasks
           </div>
         </div>
 
@@ -44,7 +54,7 @@ const TaskGroup = () => {
                 fill='#B584FF'
               />
             </svg>
-            69
+            {running}
           </a>
           <a
             className='text-sm font-medium flex flex-row items-center justify-between w-10 ml-5'
@@ -62,7 +72,7 @@ const TaskGroup = () => {
                 fill='#81C6DC'
               />
             </svg>
-            69
+            {stopped}
           </a>
         </div>
 

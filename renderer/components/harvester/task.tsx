@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 
-const gradient = {
-  background:
-    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
-};
+interface SelectedClasses {
+  background: string;
+  borderWidth?: string;
+  borderColor?: string;
+}
 
 const Task = ({
   num,
@@ -11,13 +12,27 @@ const Task = ({
   proxy,
   status,
   running,
+  id,
+  score,
+  handleClick,
 }: {
   num: number;
   email: string;
   proxy: string;
   status: string;
   running: boolean;
+  id: string;
+  score: {
+    v3: string | number;
+    v2v: string | boolean;
+    v2i: string | boolean;
+  };
+  handleClick: any;
 }) => {
+  const [selected, setSelected] = useState<SelectedClasses>({
+    background:
+      "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  });
   function getCorrectButton() {
     if (running) {
       return (
@@ -56,10 +71,23 @@ const Task = ({
     }
   }
   const classes = `text-sm font-medium w-1/5 overflow-hidden mr-10`;
+
+  function clickedTask(e) {
+    setSelected({
+      ...selected,
+      borderWidth: "2px",
+      borderColor: "rgba(181, 132, 255, 1)",
+    });
+
+    handleClick(e);
+  }
+
   return (
     <>
       <div
-        style={gradient}
+        onClick={clickedTask}
+        id={id}
+        style={selected}
         className='flex flex-row  px-6 items-center rounded-lg h-16 w-full mt-5 text-center overflow-hidden'
       >
         <div className='text-sm font-medium w-4 mr-20'>{num}</div>

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { Scrollbars } from "react-custom-scrollbars";
-
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
@@ -14,6 +12,7 @@ import BottomBar from "../components/bottomBar";
 import ImExC from "../components/importExportCopy";
 import GroupModal from "../components/harvester/groupModal";
 import AccountModal from "../components/harvester/addAccount";
+import { ipcRenderer } from "electron";
 
 //this is the harvester for now just to get the hang of it
 
@@ -32,12 +31,79 @@ const gradient = {
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
+interface Group {
+  name: string;
+  total: number;
+  running: number;
+  stopped: number;
+  gmails?: {
+    [k: string]: Gmail;
+  };
+}
+
+interface Gmail {
+  uuid: string;
+  email: string;
+  password?: string;
+  recovery?: string;
+  proxy: string;
+  security?: string;
+  runs?: number;
+  running: boolean;
+  status: string;
+  score: {
+    v3: string | number;
+    v2i: string | boolean;
+    v2v: string | boolean;
+  };
+  groupID?: string;
+  edu?: boolean;
+}
+
 function Home() {
   const [showGroup, changeVis] = useState(false);
   const [showAccount, changeAccModal] = useState(false);
+
+  const [groups, addGroups] = useState<Array<Group>>([]);
+  const [currentGroup, setCurrentGroup] = useState<string>("default");
+  const [gmails, addGmails] = useState<Array<Gmail>>([]);
+  const [selected, addSelected] = useState<Array<string>>([]);
+
+  const newGroups = ipcRenderer.sendSync("load-gmails", {
+    initial: true,
+    groupID: undefined,
+  });
+  const g = Object.values(newGroups).map((group: any) => ({
+    name: group.name,
+    uuid: group,
+    total: Object.values(group.gmails).length,
+    running: 0,
+    stopped: 0,
+  }));
+  addGroups(g);
+
   const isBlurred = () => {
     if (showGroup || showAccount) return { filter: "blur(3px)" };
     return {};
+  };
+  const getGmails = (id: string) => {
+    const gmails = ipcRenderer.sendSync("load-gmails", {
+      fromfile: false,
+      groupID: id,
+    });
+    const gmailsState = Object.values(gmails).map((gmail: Gmail) => ({
+      uuid: gmail.uuid,
+      email: gmail.email,
+      status: gmail.status,
+      proxy: gmail.proxy,
+      running: gmail.running,
+      score: gmail.score,
+    }));
+    addGmails(gmailsState);
+  };
+
+  const selectTask = (e) => {
+    addSelected([...selected, e.target.getAttribute("id")]);
   };
   return (
     <React.Fragment>
@@ -77,15 +143,14 @@ function Home() {
                 handleClick={() => changeVis(true)}
               />
               <div className='scrollbars'>
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
-                <TaskGroup />
+                {groups.map((group) => (
+                  <TaskGroup
+                    name={group.name}
+                    stopped={group.stopped}
+                    total={group.total}
+                    running={group.running}
+                  />
+                ))}
               </div>
             </div>
 
@@ -214,20 +279,18 @@ function Home() {
                   </div>
                 </div>
                 <div className='scrollbars'>
-                  <Task
-                    num={1}
-                    email='test@gmail.com'
-                    proxy='127.0.0.1'
-                    status='Logging in..'
-                    running={true}
-                  />
-                  <Task
-                    num={2}
-                    email='testLONG1231@gmail.com'
-                    proxy='127.0.0.1'
-                    status='Idle'
-                    running={false}
-                  />
+                  {gmails.map((gmail) => (
+                    <Task
+                      handleClick={selectTask}
+                      id={gmail.uuid}
+                      score={gmail.score}
+                      num={gmails.indexOf(gmail)}
+                      email={gmail.email}
+                      proxy={gmail.proxy}
+                      status={gmail.status}
+                      running={gmail.running}
+                    />
+                  ))}
                 </div>
               </div>
               {/* <div

@@ -1,6 +1,8 @@
-import { app } from "electron";
+import { app, ipcMain } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
+import GmailFarmer from "../backend/modules/gmailfarming/index";
+import engine from "../backend/index";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -12,7 +14,7 @@ if (isProd) {
 
 (async () => {
   await app.whenReady();
-
+  const code = await engine.setup();
   const mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
@@ -34,3 +36,14 @@ if (isProd) {
 app.on("window-all-closed", () => {
   app.quit();
 });
+
+ipcMain.on(
+  "load-gmails",
+  async (
+    event,
+    { fromfile, groupID }: { fromfile: boolean; groupID: string | undefined }
+  ) => {
+    const loaded = GmailFarmer.loadGmails(fromfile, groupID);
+    event.returnValue = loaded;
+  }
+);

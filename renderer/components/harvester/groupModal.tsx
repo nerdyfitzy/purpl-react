@@ -25,6 +25,7 @@ const GroupModal = ({
   handleClose: any;
 }) => {
   if (!shown) return null;
+  const [name, setName] = useState("");
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
@@ -81,6 +82,7 @@ const GroupModal = ({
                 className='rounded-lg w-56 h-12 text-left px-4 text-xs font-medium '
                 style={{ background: "#6B6476" }}
                 placeholder='Enter group name'
+                onChange={(event) => setName(event.target.value)}
               />
             </div>
 
