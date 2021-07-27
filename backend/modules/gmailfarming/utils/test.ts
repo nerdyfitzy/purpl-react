@@ -33,7 +33,7 @@ const testGmail = async (uuid, group, type) => {
       };
       console.log(data, "debug");
       const child = spawn("node", [
-        path.join(__dirname, "test_controller.js"),
+        path.join(__dirname, "test_controller.ts"),
         JSON.stringify(data),
       ]);
       runningTasks[uuid] = child;

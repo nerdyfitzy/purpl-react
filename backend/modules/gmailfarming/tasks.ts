@@ -301,6 +301,14 @@ const deleteGmail = (groupID, gmailID) => {
   saveGmails();
 };
 
+const deleteAllGmailsInGroup = (group) => {
+  Object.values(groups[group].gmails).forEach((gmail: Gmail) => {
+    if (gmail.running) actionSpecific(gmail.uuid, group);
+  });
+
+  groups[group].gmails = {};
+};
+
 const getScores = (group, gmail) => {
   return groups[group].gmails[gmail].score;
 };
@@ -387,7 +395,7 @@ const actionSpecific = (uuid, group, manualLogin = false) => {
       const GMAIL = groups[group].gmails[uuid];
       console.log(JSON.stringify(GMAIL));
       let args = [
-        path.join(__dirname, "controller.js"),
+        "./backend/modules/gmailfarming/controller.js",
         JSON.stringify(GMAIL),
         SLEEPIN,
         RETURNIN,
@@ -613,4 +621,5 @@ export {
   importFromFile,
   copy,
   sendStatuses,
+  deleteAllGmailsInGroup,
 };

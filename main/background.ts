@@ -1,4 +1,4 @@
-import { app, ipcMain } from "electron";
+import { app, ipcMain, ipcRenderer } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import GmailFarmer from "../backend/modules/gmailfarming/index";
@@ -17,7 +17,7 @@ if (isProd) {
   const code = await engine.setup();
   const mainWindow = createWindow("main", {
     width: 1600,
-    height: 500,
+    height: 800,
     frame: false,
     webPreferences: {
       enableRemoteModule: true,
@@ -82,4 +82,36 @@ ipcMain.on("edit-gmail-group", (event, { editedUuid, name }) => {
 
 ipcMain.on("delete-gmail-group", (event, uuid) => {
   GmailFarmer.deleteGroup(uuid);
+});
+
+ipcMain.on("get-gmail", async (event, { group, uuid }) => {
+  const gmail = await GmailFarmer.getGmail(uuid, group);
+  event.returnValue = gmail;
+});
+
+ipcMain.on(
+  "edit-gmail",
+  (event, { email, password, recovery, question, proxy, uuid, group }) => {
+    GmailFarmer.editGmail(
+      uuid,
+      group,
+      email,
+      password,
+      recovery,
+      question,
+      proxy
+    );
+  }
+);
+
+ipcMain.on("delete-gmail", (event, { groupID, uuid }) => {
+  GmailFarmer.deleteGmail(groupID, uuid);
+});
+
+ipcMain.on("delete-all-gmails", (event, group) => {
+  GmailFarmer.deleteAllGmailsInGroup(group);
+});
+
+ipcMain.on("action-gmail", (event, { uuid, groupID }) => {
+  GmailFarmer.actionSpecific(uuid, groupID, false);
 });

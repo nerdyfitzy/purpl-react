@@ -48,4 +48,4 @@ const autoScroll = async (page) => {
   });
 };
 
-export { readNews };
+export default { readNews };

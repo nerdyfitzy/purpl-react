@@ -1,4 +1,6 @@
+import { ipcRenderer } from "electron";
 import React, { useState } from "react";
+import AccountModal from "./addAccount";
 
 interface SelectedClasses {
   background: string;
@@ -15,6 +17,10 @@ const Task = ({
   id,
   score,
   handleClick,
+  groupID,
+  handleEdit,
+  handleDelete,
+  handleStart,
 }: {
   num: number;
   email: string;
@@ -28,11 +34,16 @@ const Task = ({
     v2i: string | boolean;
   };
   handleClick: any;
+  groupID: string;
+  handleEdit: any;
+  handleDelete: any;
+  handleStart: any;
 }) => {
   const [selected, setSelected] = useState<SelectedClasses>({
     background:
       "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
   });
+  const [shown, changeVis] = useState(false);
   function getCorrectButton() {
     if (running) {
       return (
@@ -73,19 +84,55 @@ const Task = ({
   const classes = `text-sm font-medium w-1/5 overflow-hidden mr-10`;
 
   function clickedTask(e) {
-    setSelected({
-      ...selected,
-      borderWidth: "2px",
-      borderColor: "rgba(181, 132, 255, 1)",
-    });
+    if (typeof selected.borderWidth !== "undefined") {
+      setSelected({
+        background:
+          "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+      });
+    } else {
+      setSelected({
+        ...selected,
+        borderWidth: "2px",
+        borderColor: "rgba(181, 132, 255, 1)",
+      });
+    }
 
     handleClick(e);
   }
 
+  function editGmail(emailN, proxyN) {
+    handleEdit(id, {
+      uuid: id,
+      email: emailN,
+      status: status,
+      proxy: proxyN,
+      running: running,
+      score: score,
+    });
+  }
+
+  function deleteGmail() {
+    ipcRenderer.send("delete-gmail", { groupID, uuid: id });
+    handleDelete(id);
+  }
+
+  function onAction() {
+    ipcRenderer.send("action-gmail", { groupID, uuid: id });
+    handleStart(id);
+  }
+
   return (
     <>
+      <AccountModal
+        shown={shown}
+        handleClose={() => changeVis(false)}
+        group={groupID}
+        handleSubmit={editGmail}
+        edit={true}
+        editedUuid={id}
+      />
       <div
-        onClick={clickedTask}
+        onClick={(event) => clickedTask(event.currentTarget.getAttribute("id"))}
         id={id}
         style={selected}
         className='flex flex-row  px-6 items-center rounded-lg h-16 w-full mt-5 text-center overflow-hidden'
@@ -110,8 +157,8 @@ const Task = ({
           {status}
         </div>
         <div className='flex flex-row ml-9'>
-          <button>{getCorrectButton()}</button>
-          <button className='mx-2'>
+          <button onClick={onAction}>{getCorrectButton()}</button>
+          <button className='mx-2' onClick={() => changeVis(true)}>
             <svg
               width='20'
               height='20'
@@ -131,7 +178,7 @@ const Task = ({
               </g>
             </svg>
           </button>
-          <button>
+          <button onClick={deleteGmail}>
             <svg
               width='20'
               height='20'

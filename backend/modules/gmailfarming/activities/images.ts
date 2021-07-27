@@ -116,4 +116,4 @@ const scrollTo = async (x, y, page) => {
   );
 };
 
-export { images };
+export default { images };

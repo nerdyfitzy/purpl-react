@@ -7,6 +7,7 @@ const Input = ({
   className,
   width,
   handleChange,
+  value,
 }: {
   title: string;
   placeholder: string;
@@ -14,6 +15,7 @@ const Input = ({
   className?: string;
   width?: string;
   handleChange: any;
+  value?: string;
 }) => {
   let titleNew = title;
   if (required) titleNew += " *";
@@ -33,6 +35,7 @@ const Input = ({
         className={inputClasses}
         style={{ background: "#6B6476" }}
         placeholder={placeholder}
+        value={value}
       />
     </div>
   );

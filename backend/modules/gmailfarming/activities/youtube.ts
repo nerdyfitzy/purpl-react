@@ -205,4 +205,4 @@ const checktime = async (page, time) => {
   }
 };
 
-export { watchYT };
+export default { watchYT };

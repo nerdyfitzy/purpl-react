@@ -18,8 +18,8 @@ const Actions = () => {
   return (
     <>
       <Toaster position='bottom-right' />
-      <div className='absolute right-4 top-0 h-10 flex flex-row justify-end items-center w-full drag'>
-        <button onClick={minimizeWindow}>
+      <div className='absolute left-0 top-0 h-10 flex flex-row z-30 justify-end items-center w-full drag'>
+        <button onClick={minimizeWindow} className=''>
           <svg
             className='mx-2 my-4'
             width='15'
@@ -34,7 +34,7 @@ const Actions = () => {
             />
           </svg>
         </button>
-        <button onClick={closeWindow}>
+        <button onClick={closeWindow} className='mr-5'>
           <svg
             width='15'
             height='15'

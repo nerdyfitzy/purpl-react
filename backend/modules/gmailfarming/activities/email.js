@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import * as console from "../../../utils/logger";
+const fs = require("fs");
+const path = require("path");
+const console = require("../../../utils/logger.ts");
 const terms = [
   "nfl",
   "football",
@@ -139,4 +139,4 @@ const humanTyping = async (element, word, page) => {
   }
 };
 
-export { checkEmails, sendEmails };
+module.exports = { checkEmails, sendEmails };

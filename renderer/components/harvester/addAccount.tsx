@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Input from "../styledInput";
 
@@ -24,11 +24,15 @@ const AccountModal = ({
   handleClose,
   group,
   handleSubmit,
+  edit = false,
+  editedUuid,
 }: {
   shown: boolean;
   handleClose: any;
   group: string;
   handleSubmit: any;
+  edit?: boolean;
+  editedUuid?: string;
 }) => {
   if (!shown) return null;
 
@@ -38,33 +42,63 @@ const AccountModal = ({
   const [question, setQuestion] = useState("");
   const [proxy, setProxy] = useState("");
 
+  useEffect(() => {
+    if (!edit) return;
+    const gmail = ipcRenderer.sendSync("get-gmail", {
+      group,
+      uuid: editedUuid,
+    });
+    console.log(gmail);
+    setEmail(gmail.email);
+    setPassword(gmail.password);
+    setRecovery(gmail.recovery);
+    setQuestion(gmail.security);
+    setProxy(gmail.proxy);
+    return () => {};
+  }, []);
+
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
-    toast.success("Added Account!");
-    const newGmail = ipcRenderer.sendSync("new-gmail", {
-      email,
-      recovery,
-      password,
-      question,
-      proxy,
-      group,
-    });
-    handleSubmit({
-      uuid: newGmail.uuid,
-      email: newGmail.email,
-      status: newGmail.status,
-      proxy: newGmail.proxy,
-      running: newGmail.running,
-      score: newGmail.score,
-    });
+    if (!edit) {
+      toast.success("Added Account!");
+      const newGmail = ipcRenderer.sendSync("new-gmail", {
+        email,
+        recovery,
+        password,
+        question,
+        proxy,
+        group,
+      });
+      handleSubmit({
+        uuid: newGmail.uuid,
+        email: newGmail.email,
+        status: newGmail.status,
+        proxy: newGmail.proxy,
+        running: newGmail.running,
+        score: newGmail.score,
+      });
+    } else {
+      toast.success("Edited Gmail!");
+      ipcRenderer.send("edit-gmail", {
+        email,
+        password,
+        recovery,
+        question,
+        proxy,
+        uuid: editedUuid,
+        group,
+      });
+      handleSubmit(email, proxy);
+    }
+
     handleClose();
   }
   return (
     <>
       <div
-        className='w-full h-full flex justify-center items-center absolute z-30'
+        className='w-full h-full flex justify-center items-center absolute top-0 left-0 z-30'
         style={darken}
         onClick={handleClick}
         id='modalBackground'
@@ -107,6 +141,7 @@ const AccountModal = ({
               width='w-72'
               className='mr-1'
               handleChange={setEmail}
+              value={email}
             />
             <Input
               placeholder='Enter password'
@@ -114,6 +149,7 @@ const AccountModal = ({
               required={true}
               width='w-60'
               handleChange={setPassword}
+              value={password}
             />
             <div className='h-24'></div>
             <Input
@@ -121,12 +157,14 @@ const AccountModal = ({
               title='Recovery Email'
               width='w-72'
               handleChange={setRecovery}
+              value={recovery}
             />
             <Input
               placeholder='Enter security question'
               title='Security Question'
               width='w-60'
               handleChange={setQuestion}
+              value={question}
             />
             <div className='h-24'></div>
             <Input
@@ -135,6 +173,7 @@ const AccountModal = ({
               required={true}
               width='w-96'
               handleChange={setProxy}
+              value={proxy}
             />
             <button
               className='rounded-lg text-center align-middle absolute -bottom-16 right-8 h-10 w-16'

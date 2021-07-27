@@ -130,11 +130,20 @@ function Home() {
   };
 
   const selectTask = (e) => {
-    addSelected([...selected, e.target.getAttribute("id")]);
+    if (selected.includes(e)) {
+      let copy = [...selected];
+      const index = copy.indexOf(e);
+      copy.splice(index, 1);
+      addSelected(copy);
+    } else {
+      addSelected([...selected, e]);
+    }
+
+    console.log(selected);
   };
   const selectGroup = (e) => {
-    console.log("from harv", e);
     setCurrentGroup(e);
+    addSelected([]);
     getGmails(e);
   };
   const incStopNumber = (uuid: string, inc: number, change: boolean) => {
@@ -162,10 +171,21 @@ function Home() {
 
   const startAll = () => {
     ipcRenderer.send("start-all-gmails", currentGroup);
+    let copy = [...gmails];
+    copy.map((gmail) => (gmail.running = true));
+    addGmails(copy);
   };
 
   const stopAll = () => {
     ipcRenderer.send("stop-all-gmails", currentGroup);
+    let copy = [...gmails];
+    copy.map((gmail) => (gmail.running = false));
+    addGmails(copy);
+  };
+
+  const deleteAll = () => {
+    ipcRenderer.send("delete-all-gmails", currentGroup);
+    addGmails([]);
   };
 
   const handleGroupEdit = (uuid: string, name: string) => {
@@ -186,6 +206,36 @@ function Home() {
     if (index > -1) {
       copy.splice(index, 1);
       addGroups(copy);
+    }
+  };
+
+  const handleGmailEdit = (id: string, newGmail: Gmail) => {
+    let copy = [...gmails];
+    let [res] = gmails.filter((obj) => obj.uuid === id);
+    const index = gmails.indexOf(res);
+    if (index > -1) {
+      copy[index] = newGmail;
+      addGmails(copy);
+    }
+  };
+
+  const handleGmailAction = (id: string) => {
+    let copy = [...gmails];
+    let [res] = gmails.filter((obj) => obj.uuid === id);
+    const index = gmails.indexOf(res);
+    if (index > -1) {
+      copy[index].running = !copy[index].running;
+      addGmails(copy);
+    }
+  };
+
+  const handleGmailDelete = (id: string) => {
+    let copy = [...gmails];
+    let [res] = gmails.filter((obj) => obj.uuid === id);
+    const index = gmails.indexOf(res);
+    if (index > -1) {
+      copy.splice(index, 1);
+      addGmails(copy);
     }
   };
 
@@ -241,13 +291,13 @@ function Home() {
                   <TaskGroup
                     uuid={group.uuid}
                     isselected={currentGroup === group.uuid}
-                    handleClick={selectGroup}
                     name={group.name}
                     stopped={group.stopped}
                     total={group.total}
                     running={group.running}
                     handleEdit={handleGroupEdit}
                     handleDelete={handleGroupDelete}
+                    handleClick={selectGroup}
                   />
                 ))}
               </div>
@@ -313,6 +363,7 @@ function Home() {
                   <button
                     className='mr-4 flex flex-row justify-evenly items-center w-24 font-medium text-sm'
                     style={{ color: "#6F6B75" }}
+                    onClick={deleteAll}
                   >
                     <svg
                       width='15'
@@ -382,6 +433,9 @@ function Home() {
                 <div className='scrollbars h-4/6'>
                   {gmails.map((gmail) => (
                     <Task
+                      handleEdit={handleGmailEdit}
+                      handleDelete={handleGmailDelete}
+                      groupID={currentGroup}
                       handleClick={selectTask}
                       id={gmail.uuid}
                       score={gmail.score}
@@ -390,6 +444,7 @@ function Home() {
                       proxy={gmail.proxy}
                       status={gmail.status}
                       running={gmail.running}
+                      handleStart={handleGmailAction}
                     />
                   ))}
                 </div>

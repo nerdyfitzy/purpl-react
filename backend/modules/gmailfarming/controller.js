@@ -1,16 +1,13 @@
 //stop = 1
 //manual login = 2
-const tasks = require("./tasks");
-const test = require("./utils/test");
-const emails = require("./activities/email");
+const emails = require("./activities/email.js");
 const youtube = require("./activities/youtube");
 const news = require("./activities/news");
 const google = require("./activities/google");
 const images = require("./activities/images");
 const subscribe = require("./activities/subscribe");
 const puppeteer = require("puppeteer-extra");
-import * as console from "../../utils/logger";
-const path = require("path");
+const console = require("../../utils/logger");
 const stealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(stealth());
 
@@ -145,7 +142,7 @@ const runFlow = async (browserInfo) => {
         message: "Searching Google",
       })
     );
-    await google.google(browserInfo.page);
+    await google(browserInfo.page);
   } else {
     process.stdout.write(
       JSON.stringify({
@@ -562,6 +559,7 @@ const login = async (browser, proxy = "") => {
 
     if (process.argv[5] === "-m") {
       var browserHeaded = await puppeteer.launch({
+        //@ts-ignore
         headless: false,
         executablePath:
           "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -578,6 +576,7 @@ const login = async (browser, proxy = "") => {
 
       if (proxy !== "localhost") {
         var browser = await puppeteer.launch({
+          //@ts-ignore
           headless: true,
           executablePath:
             "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -594,6 +593,7 @@ const login = async (browser, proxy = "") => {
         });
       } else {
         var browser = await puppeteer.launch({
+          //@ts-ignore
           headless: true,
           executablePath:
             "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -609,6 +609,7 @@ const login = async (browser, proxy = "") => {
     } else {
       if (proxy !== "localhost" || typeof proxy !== "undefined") {
         var browser = await puppeteer.launch({
+          //@ts-ignore
           headless: true,
           executablePath:
             "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -619,6 +620,7 @@ const login = async (browser, proxy = "") => {
         login(browser, proxy);
       } else {
         var browser = await puppeteer.launch({
+          //@ts-ignore
           headless: true,
           executablePath:
             "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",

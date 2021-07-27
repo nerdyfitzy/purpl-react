@@ -429,11 +429,11 @@ const Navbar = ({ page }: { page: string }) => {
 
           <div
             style={borderTopStyles}
-            className='relative top-56 -left-5 h-24 py-4'
+            className='absolute bottom-28 h-24 -left-1 w-full py-4'
           >
             <Link href='/settings'>
               <a
-                className='h-8 flex flex-row items-center px-4'
+                className='h-8 flex flex-row items-center px-4 relative left-8 top-1'
                 style={isSelected("settings")}
               >
                 <svg

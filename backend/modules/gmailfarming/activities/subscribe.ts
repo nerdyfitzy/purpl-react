@@ -36,4 +36,4 @@ async function subscribe(page, email) {
   }
 }
 
-export { subscribe };
+export default { subscribe };

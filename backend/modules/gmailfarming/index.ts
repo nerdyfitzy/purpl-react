@@ -19,6 +19,7 @@ import {
   importFromFile,
   copy,
   sendStatuses,
+  deleteAllGmailsInGroup,
 } from "./tasks";
 
 export default {
@@ -35,6 +36,7 @@ export default {
   getGmail,
   editGmail,
   deleteGmail,
+  deleteAllGmailsInGroup,
   manualLogin,
   getScores,
   setScore,
