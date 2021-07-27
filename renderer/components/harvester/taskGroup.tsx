@@ -1,26 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 
 const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
+const selectedClasses = {
+  background:
+    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  borderWidth: "2px",
+  borderColor: "rgba(181, 132, 255, 1)",
+};
+
+interface SelectedClasses {
+  background: string;
+  borderWidth?: string;
+  borderColor?: string;
+}
+
 const TaskGroup = ({
   name,
   total,
   running,
   stopped,
+  handleClick,
+  isselected,
+  uuid,
 }: {
   name: string;
   total: number;
   running: number;
   stopped: number;
+  handleClick: Function;
+  isselected: boolean;
+  uuid: string;
 }) => {
+  console.log(isselected);
+  function groupClicked(event) {
+    console.log("group clicked", event);
+    handleClick(event);
+  }
+  function getSelectedClasses() {
+    if (isselected) return selectedClasses;
+    return gradient;
+  }
   return (
     <>
       <div
+        id={uuid}
         className='flex flex-col justify-between h-36 w-10/12 rounded-lg p-5 relative mb-4'
-        style={gradient}
+        style={getSelectedClasses()}
+        onClick={(event) =>
+          groupClicked(event.currentTarget.getAttribute("id"))
+        }
       >
         <div className='font-semibold text-md'>
           {name}

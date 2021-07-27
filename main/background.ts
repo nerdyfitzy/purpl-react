@@ -41,9 +41,9 @@ ipcMain.on(
   "load-gmails",
   async (
     event,
-    { fromfile, groupID }: { fromfile: boolean; groupID: string | undefined }
+    { initial, groupID }: { initial: boolean; groupID: string | undefined }
   ) => {
-    const loaded = GmailFarmer.loadGmails(fromfile, groupID);
+    const loaded = GmailFarmer.loadGmails(initial, groupID);
     event.returnValue = loaded;
   }
 );

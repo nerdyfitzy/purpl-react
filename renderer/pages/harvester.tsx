@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Actions from "../components/actions";
@@ -33,6 +33,7 @@ const gradient = {
 
 interface Group {
   name: string;
+  uuid: string;
   total: number;
   running: number;
   stopped: number;
@@ -69,24 +70,28 @@ function Home() {
   const [gmails, addGmails] = useState<Array<Gmail>>([]);
   const [selected, addSelected] = useState<Array<string>>([]);
 
-  const newGroups = ipcRenderer.sendSync("load-gmails", {
-    initial: true,
-    groupID: undefined,
-  });
-  const g = Object.values(newGroups).map((group: any) => ({
-    name: group.name,
-    uuid: group,
-    total: Object.values(group.gmails).length,
-    running: 0,
-    stopped: 0,
-  }));
-  addGroups(g);
+  useEffect(() => {
+    const newGroups = ipcRenderer.sendSync("load-gmails", {
+      initial: true,
+      groupID: undefined,
+    });
+    const g = Object.values(newGroups).map((group: any) => ({
+      name: group.name,
+      uuid: group.uuid,
+      total: Object.values(group.gmails).length,
+      running: 0,
+      stopped: 0,
+    }));
+    addGroups(g);
+    console.log(groups);
+  }, []);
 
   const isBlurred = () => {
     if (showGroup || showAccount) return { filter: "blur(3px)" };
     return {};
   };
   const getGmails = (id: string) => {
+    console.log("getting gmails of", id);
     const gmails = ipcRenderer.sendSync("load-gmails", {
       fromfile: false,
       groupID: id,
@@ -104,6 +109,11 @@ function Home() {
 
   const selectTask = (e) => {
     addSelected([...selected, e.target.getAttribute("id")]);
+  };
+  const selectGroup = (e) => {
+    console.log("from harv", e);
+    setCurrentGroup(e);
+    getGmails(e);
   };
   return (
     <React.Fragment>
@@ -145,6 +155,9 @@ function Home() {
               <div className='scrollbars'>
                 {groups.map((group) => (
                   <TaskGroup
+                    uuid={group.uuid}
+                    isselected={currentGroup === group.uuid}
+                    handleClick={selectGroup}
                     name={group.name}
                     stopped={group.stopped}
                     total={group.total}

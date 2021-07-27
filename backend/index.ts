@@ -13,7 +13,7 @@ const clientId = "785264365963182121";
 dotenv.config();
 const setActivity = (rpc) => {
   rpc.setActivity({
-    details: "Alpha",
+    details: "Beta 2.0",
     state: "Automation Done Better",
     startTimestamp: Date.now(),
     largeImageKey: "purpl",
