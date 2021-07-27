@@ -67,3 +67,19 @@ ipcMain.on(
     event.returnValue = newGmail;
   }
 );
+
+ipcMain.on("start-all-gmails", (event, group) => {
+  GmailFarmer.startAll(group);
+});
+
+ipcMain.on("stop-all-gmails", (event, group) => {
+  GmailFarmer.stopAll(group);
+});
+
+ipcMain.on("edit-gmail-group", (event, { editedUuid, name }) => {
+  if (typeof editedUuid === "string") GmailFarmer.editGroup(name, editedUuid);
+});
+
+ipcMain.on("delete-gmail-group", (event, uuid) => {
+  GmailFarmer.deleteGroup(uuid);
+});

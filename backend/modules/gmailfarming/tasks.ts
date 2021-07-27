@@ -247,15 +247,16 @@ const loadGmails = (fromfile, groupID) => {
         path.join(process.env.APPDATA, "purpl", "local-data", "gmails.json")
       )
     )
-      return undefined;
+      return groups;
     console.log("file exists, reading", "info");
     let temp = fs.readFileSync(
       path.join(process.env.APPDATA, "purpl", "local-data", "gmails.json"),
       "utf8"
     );
     groups = temp !== "" ? JSON.parse(temp) : groups;
-    return temp !== "" ? JSON.parse(temp) : undefined;
+    return temp !== "" ? JSON.parse(temp) : groups;
   } else {
+    if (typeof groups[groupID] === "undefined") return undefined;
     console.log(
       `[${new Date().toLocaleTimeString()}] - Loading Group ${groupID}`,
       "info"

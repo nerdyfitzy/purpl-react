@@ -22,10 +22,14 @@ const GroupModal = ({
   shown,
   handleClose,
   handleSubmit,
+  edit = false,
+  editedUuid,
 }: {
   shown: boolean;
   handleClose: any;
   handleSubmit: Function;
+  edit?: boolean;
+  editedUuid?: string;
 }) => {
   if (!shown) return null;
   const [name, setName] = useState("");
@@ -33,21 +37,31 @@ const GroupModal = ({
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
-    toast.success("Added Group!");
-    const newGroup = ipcRenderer.sendSync("new-gmail-group", name);
-    handleSubmit({
-      name: newGroup.name,
-      uuid: newGroup.uuid,
-      total: 0,
-      running: 0,
-      stopped: 0,
-    });
+    if (!edit) {
+      toast.success("Added Group!");
+      const newGroup = ipcRenderer.sendSync("new-gmail-group", name);
+      handleSubmit({
+        name: newGroup.name,
+        uuid: newGroup.uuid,
+        total: 0,
+        running: 0,
+        stopped: 0,
+      });
+    } else {
+      toast.success("Edited Group!");
+      ipcRenderer.send("edit-gmail-group", { name, editedUuid });
+      handleSubmit(name);
+    }
     handleClose();
+  }
+  function isEdit() {
+    if (edit) return "Edit";
+    return "Add";
   }
   return (
     <>
       <div
-        className='w-full h-full flex justify-center items-center absolute z-30'
+        className='w-full h-full flex justify-center items-center absolute top-0 left-0 z-30'
         style={darken}
         onClick={handleClick}
         id='modalBackground'
@@ -79,7 +93,7 @@ const GroupModal = ({
               className='absolute top-8 left-12 text-md font-semibold p-2 w-1/5'
               style={botBorder}
             >
-              Add Group
+              {isEdit()} Group
             </div>
           </div>
           <div className='modalBottom relative'>

@@ -98,6 +98,7 @@ function Home() {
       fromfile: false,
       groupID: id,
     });
+    if (typeof gmails === "undefined") return;
     let startNum = 0;
     let stopNum = 0;
     const gmailsState = Object.values(gmails).map((gmail: Gmail) => {
@@ -159,6 +160,35 @@ function Home() {
     }
   };
 
+  const startAll = () => {
+    ipcRenderer.send("start-all-gmails", currentGroup);
+  };
+
+  const stopAll = () => {
+    ipcRenderer.send("stop-all-gmails", currentGroup);
+  };
+
+  const handleGroupEdit = (uuid: string, name: string) => {
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = groups.indexOf(res);
+    if (index > -1) {
+      res.name = name;
+      copy[index] = res;
+      addGroups(copy);
+    }
+  };
+
+  const handleGroupDelete = (uuid: string) => {
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = groups.indexOf(res);
+    if (index > -1) {
+      copy.splice(index, 1);
+      addGroups(copy);
+    }
+  };
+
   const isBlurred = () => {
     if (showGroup || showAccount) return { filter: "blur(3px)" };
     return {};
@@ -216,6 +246,8 @@ function Home() {
                     stopped={group.stopped}
                     total={group.total}
                     running={group.running}
+                    handleEdit={handleGroupEdit}
+                    handleDelete={handleGroupDelete}
                   />
                 ))}
               </div>
@@ -239,6 +271,7 @@ function Home() {
                   <button
                     className='mr-4 flex flex-row justify-evenly items-center w-24 font-medium text-sm'
                     style={{ color: "#6F6B75" }}
+                    onClick={startAll}
                   >
                     <svg
                       width='15'
@@ -257,6 +290,7 @@ function Home() {
                   <button
                     className='mr-4 flex flex-row justify-evenly items-center w-24 font-medium text-sm'
                     style={{ color: "#6F6B75" }}
+                    onClick={stopAll}
                   >
                     <svg
                       width='15'
