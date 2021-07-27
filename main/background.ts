@@ -16,8 +16,8 @@ if (isProd) {
   await app.whenReady();
   const code = await engine.setup();
   const mainWindow = createWindow("main", {
-    width: 1000,
-    height: 600,
+    width: 1600,
+    height: 500,
     frame: false,
     webPreferences: {
       enableRemoteModule: true,
@@ -45,5 +45,25 @@ ipcMain.on(
   ) => {
     const loaded = GmailFarmer.loadGmails(initial, groupID);
     event.returnValue = loaded;
+  }
+);
+
+ipcMain.on("new-gmail-group", async (event, name) => {
+  const newGroup = await GmailFarmer.addGroup(name);
+  event.returnValue = newGroup;
+});
+
+ipcMain.on(
+  "new-gmail",
+  async (event, { email, recovery, password, question, proxy, group }) => {
+    const newGmail = await GmailFarmer.newGmail(
+      email,
+      password,
+      proxy,
+      recovery,
+      question,
+      group
+    );
+    event.returnValue = newGmail;
   }
 );

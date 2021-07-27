@@ -6,12 +6,14 @@ const Input = ({
   required = false,
   className,
   width,
+  handleChange,
 }: {
   title: string;
   placeholder: string;
   required?: boolean;
   className?: string;
   width?: string;
+  handleChange: any;
 }) => {
   let titleNew = title;
   if (required) titleNew += " *";
@@ -25,6 +27,7 @@ const Input = ({
         {titleNew}
       </label>
       <input
+        onChange={(event) => handleChange(event.target.value)}
         id='groupName'
         type='text'
         className={inputClasses}

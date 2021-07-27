@@ -1,3 +1,4 @@
+import { ipcRenderer } from "electron";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import Input from "../styledInput";
@@ -21,16 +22,43 @@ const darken = { background: "rgba(0, 0, 0, 0.6)" };
 const AccountModal = ({
   shown,
   handleClose,
+  group,
+  handleSubmit,
 }: {
   shown: boolean;
   handleClose: any;
+  group: string;
+  handleSubmit: any;
 }) => {
   if (!shown) return null;
+
+  const [email, setEmail] = useState("");
+  const [recovery, setRecovery] = useState("");
+  const [password, setPassword] = useState("");
+  const [question, setQuestion] = useState("");
+  const [proxy, setProxy] = useState("");
+
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
     toast.success("Added Account!");
+    const newGmail = ipcRenderer.sendSync("new-gmail", {
+      email,
+      recovery,
+      password,
+      question,
+      proxy,
+      group,
+    });
+    handleSubmit({
+      uuid: newGmail.uuid,
+      email: newGmail.email,
+      status: newGmail.status,
+      proxy: newGmail.proxy,
+      running: newGmail.running,
+      score: newGmail.score,
+    });
     handleClose();
   }
   return (
@@ -78,23 +106,27 @@ const AccountModal = ({
               required={true}
               width='w-72'
               className='mr-1'
+              handleChange={setEmail}
             />
             <Input
               placeholder='Enter password'
               title='Password'
               required={true}
               width='w-60'
+              handleChange={setPassword}
             />
             <div className='h-24'></div>
             <Input
               placeholder='Enter recovery'
               title='Recovery Email'
               width='w-72'
+              handleChange={setRecovery}
             />
             <Input
               placeholder='Enter security question'
               title='Security Question'
               width='w-60'
+              handleChange={setQuestion}
             />
             <div className='h-24'></div>
             <Input
@@ -102,6 +134,7 @@ const AccountModal = ({
               title='Proxy'
               required={true}
               width='w-96'
+              handleChange={setProxy}
             />
             <button
               className='rounded-lg text-center align-middle absolute -bottom-16 right-8 h-10 w-16'

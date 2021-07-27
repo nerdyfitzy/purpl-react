@@ -93,8 +93,22 @@ const Task = ({
         <div className='text-sm font-medium w-4 mr-20'>{num}</div>
         <div className={classes}>{email}</div>
         <div className={classes}>{proxy}</div>
-        <div className={classes}>{status}</div>
-        <div className={classes}>{status}</div>
+        <div className='text-sm font-medium w-1/5 overflow-hidden mr-5'>
+          <div className='flex flex-col h-full'>
+            <div className='text-2xs'>
+              v3 - {score.v3 ? score.v3 : "Untested"}
+            </div>
+            <div className='text-2xs'>
+              v2i - {score.v2i ? score.v2i : "Untested"}
+            </div>
+            <div className='text-2xs'>
+              v2v - {score.v2v ? score.v2v : "Untested"}
+            </div>
+          </div>
+        </div>
+        <div className='text-sm font-medium w-1/5 overflow-hidden mr-7'>
+          {status}
+        </div>
         <div className='flex flex-row ml-9'>
           <button>{getCorrectButton()}</button>
           <button className='mx-2'>

@@ -48,8 +48,7 @@ interface Gmail {
 var groups = {
   default: {
     uuid: "default",
-    name: "default",
-    tags: "purpl default group",
+    name: "Default",
     gmails: {},
   },
 };
@@ -74,21 +73,19 @@ const copy = (group, gmail, thing) => {
 };
 
 //GROUP FUNCTIONS
-const addGroup = (name, tags, save = true) => {
+const addGroup = (name, save = true) => {
   const groupuuid = uuid.v4();
   groups[groupuuid] = {
     uuid: groupuuid,
     name: name,
-    tags: tags,
     gmails: {},
   };
   if (save) saveGmails();
   return groups[groupuuid];
 };
 
-const editGroup = (newName, newTags, id) => {
+const editGroup = (newName, id) => {
   groups[id].name = newName;
-  groups[id].tags = newTags;
   saveGmails();
 };
 
@@ -169,7 +166,7 @@ const importFromFile = (path) => {
                 false
               );
             } else if (typeof newGroups[row.Category] === "undefined") {
-              const newG = await addGroup(row["Category"], "Other");
+              const newG = await addGroup(row["Category"]);
               newGroups[row["Category"]] = {
                 name: row["Category"],
                 uuid: newG.uuid,
@@ -206,7 +203,7 @@ const importFromFile = (path) => {
           typeof newGroups[gmail.groupName] === "undefined" &&
           gmail.groupName !== "All"
         ) {
-          let newG = await addGroup(gmail.groupName, "Other");
+          let newG = await addGroup(gmail.groupName);
           newGroups[newG.name] == newG;
           newGmail(
             gmail.account.account,

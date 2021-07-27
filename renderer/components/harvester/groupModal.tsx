@@ -1,3 +1,4 @@
+import { ipcRenderer } from "electron";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -20,9 +21,11 @@ const darken = { background: "rgba(0, 0, 0, 0.6)" };
 const GroupModal = ({
   shown,
   handleClose,
+  handleSubmit,
 }: {
   shown: boolean;
   handleClose: any;
+  handleSubmit: Function;
 }) => {
   if (!shown) return null;
   const [name, setName] = useState("");
@@ -31,6 +34,14 @@ const GroupModal = ({
   }
   function submitData() {
     toast.success("Added Group!");
+    const newGroup = ipcRenderer.sendSync("new-gmail-group", name);
+    handleSubmit({
+      name: newGroup.name,
+      uuid: newGroup.uuid,
+      total: 0,
+      running: 0,
+      stopped: 0,
+    });
     handleClose();
   }
   return (

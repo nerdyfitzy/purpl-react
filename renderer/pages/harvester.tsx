@@ -75,36 +75,57 @@ function Home() {
       initial: true,
       groupID: undefined,
     });
-    const g = Object.values(newGroups).map((group: any) => ({
-      name: group.name,
-      uuid: group.uuid,
-      total: Object.values(group.gmails).length,
-      running: 0,
-      stopped: 0,
-    }));
+    const g = Object.values(newGroups).map((group: any) => {
+      const running = Object.values(group.gmails).filter(
+        (gmail: Gmail) => gmail.running
+      ).length;
+      return {
+        name: group.name,
+        uuid: group.uuid,
+        total: Object.values(group.gmails).length,
+        running: running,
+        stopped: Object.values(group.gmails).length - running,
+      };
+    });
     addGroups(g);
+    if (newGroups["default"].gmails !== {}) getGmails("default");
     console.log(groups);
   }, []);
 
-  const isBlurred = () => {
-    if (showGroup || showAccount) return { filter: "blur(3px)" };
-    return {};
-  };
   const getGmails = (id: string) => {
     console.log("getting gmails of", id);
     const gmails = ipcRenderer.sendSync("load-gmails", {
       fromfile: false,
       groupID: id,
     });
-    const gmailsState = Object.values(gmails).map((gmail: Gmail) => ({
-      uuid: gmail.uuid,
-      email: gmail.email,
-      status: gmail.status,
-      proxy: gmail.proxy,
-      running: gmail.running,
-      score: gmail.score,
-    }));
+    let startNum = 0;
+    let stopNum = 0;
+    const gmailsState = Object.values(gmails).map((gmail: Gmail) => {
+      if (gmail.running) startNum++;
+      else stopNum++;
+
+      return {
+        uuid: gmail.uuid,
+        email: gmail.email,
+        status: gmail.status,
+        proxy: gmail.proxy,
+        running: gmail.running,
+        score: gmail.score,
+      };
+    });
+    console.log(startNum, stopNum);
+    incStartNumber(id, startNum, true);
+    incStopNumber(id, stopNum, true);
     addGmails(gmailsState);
+  };
+
+  const addGroup = (group: Group) => {
+    addGroups([...groups, group]);
+  };
+
+  const addGmail = (gmail: Gmail) => {
+    addGmails([...gmails, gmail]);
+    incStopNumber(currentGroup, 1, false);
   };
 
   const selectTask = (e) => {
@@ -115,13 +136,46 @@ function Home() {
     setCurrentGroup(e);
     getGmails(e);
   };
+  const incStopNumber = (uuid: string, inc: number, change: boolean) => {
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = groups.indexOf(res);
+    if (index > -1) {
+      res.stopped += inc;
+      if (change) res.stopped = inc;
+      copy[index] = res;
+      addGroups(copy);
+    }
+  };
+  const incStartNumber = (uuid: string, inc: number, change: boolean) => {
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = groups.indexOf(res);
+    if (index > -1) {
+      res.running += inc;
+      if (change) res.running = inc;
+      copy[index] = res;
+      addGroups(copy);
+    }
+  };
+
+  const isBlurred = () => {
+    if (showGroup || showAccount) return { filter: "blur(3px)" };
+    return {};
+  };
   return (
     <React.Fragment>
       <Actions />
-      <GroupModal shown={showGroup} handleClose={() => changeVis(false)} />
+      <GroupModal
+        shown={showGroup}
+        handleClose={() => changeVis(false)}
+        handleSubmit={addGroup}
+      />
       <AccountModal
         shown={showAccount}
         handleClose={() => changeAccModal(false)}
+        group={currentGroup}
+        handleSubmit={addGmail}
       />
       <div className='flex h-full' style={isBlurred()}>
         <Navbar page='harvester' />
@@ -291,13 +345,13 @@ function Home() {
                     Actions
                   </div>
                 </div>
-                <div className='scrollbars'>
+                <div className='scrollbars h-4/6'>
                   {gmails.map((gmail) => (
                     <Task
                       handleClick={selectTask}
                       id={gmail.uuid}
                       score={gmail.score}
-                      num={gmails.indexOf(gmail)}
+                      num={gmails.indexOf(gmail) + 1}
                       email={gmail.email}
                       proxy={gmail.proxy}
                       status={gmail.status}
