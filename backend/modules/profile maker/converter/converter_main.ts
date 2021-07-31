@@ -155,6 +155,7 @@ const loadProfiles = (fromfile, group) => {
     groups = JSON.parse(temp.toString());
     return JSON.parse(temp.toString());
   } else {
+    if (typeof groups[group] === "undefined") return;
     console.log(
       `[${new Date().toLocaleTimeString()}] - Loading Group` +
         groups[group].name,

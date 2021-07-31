@@ -66,13 +66,13 @@ const TaskGroup = ({
     }
   };
   const deleteGroup = () => {
-    ipcRenderer.send("delete-profile-group", { uuid });
+    ipcRenderer.send("delete-profile-group", uuid);
     let copy = [...groups];
     let [res] = groups.filter((obj) => obj.uuid === uuid);
     const index = copy.indexOf(res);
     if (index > -1) {
       copy.splice(index, 1);
-      changeProfiles(copy);
+      changeGroups(copy);
     }
   };
   return (
