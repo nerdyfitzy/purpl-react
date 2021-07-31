@@ -1,9 +1,31 @@
+import { ipcRenderer } from "electron";
 import React from "react";
 
-const ImExC = () => {
+const ImExC = ({
+  page,
+  handleImport,
+  handleExport,
+  handleCopy,
+}: {
+  page: string;
+  handleImport: any;
+  handleExport: any;
+  handleCopy: any;
+}) => {
+  const fileImport = () => {
+    const data = ipcRenderer.send("import-file", page);
+    handleImport(data);
+  };
+  const fileExport = () => {
+    handleExport();
+  };
+  const copyGroup = () => {
+    handleCopy();
+  };
   return (
     <>
       <button
+        onClick={fileImport}
         className='mr-4 rounded-md h-10 w-10'
         style={{ background: "#B584FF" }}
       >
@@ -29,6 +51,7 @@ const ImExC = () => {
       <button
         className='mr-4 rounded-md h-10 w-10'
         style={{ background: "#9456F1" }}
+        onClick={fileExport}
       >
         <svg
           className='m-auto'
@@ -51,6 +74,7 @@ const ImExC = () => {
       <button
         className='mr-10 rounded-md h-10 w-10'
         style={{ background: "#81C6DC" }}
+        onClick={copyGroup}
       >
         <svg
           className='m-auto'

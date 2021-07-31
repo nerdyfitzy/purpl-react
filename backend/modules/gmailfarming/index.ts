@@ -20,10 +20,14 @@ import {
   copy,
   sendStatuses,
   deleteAllGmailsInGroup,
+  exportGmails,
+  copyGroup,
 } from "./tasks";
 
 export default {
   sleepBrowser,
+  copyGroup,
+  exportGmails,
   loadGmails,
   newGmail,
   actionSpecific,

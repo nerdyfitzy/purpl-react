@@ -1,19 +1,97 @@
-import React from "react";
+import { ipcRenderer } from "electron";
+import React, { useContext, useState } from "react";
+import { stateContext } from "../../pages/profiles";
+import { Prof, Group } from "../../public/types/profiles";
+import GroupModal from "./profGroupModal";
 
 const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
-const TaskGroup = () => {
+const selectedClasses = {
+  background:
+    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  borderWidth: "2px",
+  borderColor: "rgba(181, 132, 255, 1)",
+};
+
+const TaskGroup = ({
+  name,
+  uuid,
+  total,
+  isselected,
+}: {
+  name: string;
+  uuid: string;
+  total: number;
+  isselected: boolean;
+}) => {
+  const [shown, changeVis] = useState(false);
+  const [
+    { setCurrentGroup, changeProfiles, addSelected, changeGroups },
+    { groups, currentGroup, profiles, selected },
+  ] = useContext(stateContext);
+  const selectGroup = () => {
+    setCurrentGroup(uuid);
+    addSelected([]);
+    const profiles = ipcRenderer.sendSync("load-profiles", {
+      initial: false,
+      group: uuid,
+    });
+    if (typeof profiles === "undefined") return;
+    const newProfs = Object.values(profiles.profiles).map((profile: Prof) => ({
+      uuid: profile.uuid,
+      name: profile.profile_name,
+      address: profile.shipping.addy1,
+      email: profile.email,
+      type: profile.payment.type,
+      last4: profile.payment.cnb.substring(profile.payment.cnb.length - 4),
+    }));
+    changeProfiles(newProfs);
+  };
+
+  const getSelectedClasses = () => {
+    if (isselected) return selectedClasses;
+    return gradient;
+  };
+  const editGroup = (name) => {
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      res.name = name;
+      copy[index] = res;
+      changeGroups(copy);
+    }
+  };
+  const deleteGroup = () => {
+    ipcRenderer.send("delete-profile-group", { uuid });
+    let copy = [...groups];
+    let [res] = groups.filter((obj) => obj.uuid === uuid);
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      copy.splice(index, 1);
+      changeProfiles(copy);
+    }
+  };
   return (
     <>
+      <GroupModal
+        shown={shown}
+        edit={true}
+        editedUuid={uuid}
+        handleClose={() => changeVis(false)}
+        handleSubmit={editGroup}
+      />
       <div
-        className='flex flex-col justify-between h-36 w-10/12 rounded-lg p-5 relative'
-        style={gradient}
+        className='flex flex-col mb-4 justify-between h-36 w-10/12 rounded-lg p-5 relative'
+        style={getSelectedClasses()}
+        id={uuid}
+        onClick={selectGroup}
       >
         <div className='font-semibold text-md'>
-          Da group
+          {name}
           <div
             className='text-sm font-medium mt-1'
             style={{ color: "#6F6B75" }}
@@ -54,11 +132,11 @@ const TaskGroup = () => {
                 fill='#C29EFA'
               />
             </svg>
-            69 Profiles
+            {total} Profiles
           </div>
         </div>
 
-        <a className='absolute bottom-5 right-5'>
+        <button className='absolute bottom-5 right-5' onClick={deleteGroup}>
           <svg
             width='18'
             height='18'
@@ -77,9 +155,12 @@ const TaskGroup = () => {
               />
             </g>
           </svg>
-        </a>
+        </button>
 
-        <a className='absolute bottom-5 right-16'>
+        <button
+          className='absolute bottom-5 right-12'
+          onClick={() => changeVis(true)}
+        >
           <svg
             width='18'
             height='18'
@@ -98,7 +179,7 @@ const TaskGroup = () => {
               />
             </g>
           </svg>
-        </a>
+        </button>
       </div>
     </>
   );

@@ -49,7 +49,8 @@ const GroupModal = ({
       });
     } else {
       toast.success("Edited Group!");
-      ipcRenderer.send("edit-gmail-group", { name, editedUuid });
+      console.log(editedUuid);
+      ipcRenderer.send("edit-profile-group", { name, editedUuid });
       handleSubmit(name);
     }
     handleClose();

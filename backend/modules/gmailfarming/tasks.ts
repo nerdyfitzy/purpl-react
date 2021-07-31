@@ -1,18 +1,20 @@
 //meant to handle all gmail tasks
-const path = require("path");
-const fs = require("fs");
-const csv = require("csv-parser");
-const uuid = require("uuid");
-const clipboardy = require("clipboardy");
-const console = require("../../utils/logger");
-const test = require("./utils/test");
-const { spawn } = require("child_process");
+import path from "path";
+import fs from "fs";
+import csv from "csv-parser";
+import uuid from "uuid";
+import clipboardy from "clipboardy";
+import * as console from "../../utils/logger";
+import test from "./utils/test";
+import { spawn } from "child_process";
 let runningTasks = {};
 
 const { gmailSettings } = JSON.parse(
-  fs.readFileSync(
-    path.join(process.env.APPDATA, "purpl", "local-data", "config.json")
-  )
+  fs
+    .readFileSync(
+      path.join(process.env.APPDATA, "purpl", "local-data", "config.json")
+    )
+    .toString()
 );
 //gmails loaded into the bot
 
@@ -397,8 +399,8 @@ const actionSpecific = (uuid, group, manualLogin = false) => {
       let args = [
         "./backend/modules/gmailfarming/controller.js",
         JSON.stringify(GMAIL),
-        SLEEPIN,
-        RETURNIN,
+        SLEEPIN.toString(),
+        RETURNIN.toString(),
       ];
       if (manualLogin) args.push("-m");
       const child = spawn("node", args);
@@ -498,6 +500,7 @@ const testGmail = async (uuid, group, type) => {
     actionSpecific(uuid, group);
   }
   test.testGmail(uuid, group, type).then((rawresult) => {
+    //@ts-ignore
     const parsedResult = JSON.parse(rawresult);
     console.log(
       `[${new Date().toLocaleTimeString()}] - Got result ${parsedResult}`,
@@ -547,36 +550,49 @@ const pullFromQueue = () => {
   actionSpecific(unqueued.uuid, unqueued.groupID);
 };
 
-//REWRITE THIS!!!
-// const exportGmails = () => {
-//   let base = "EMAIL,PASSWORD,RECOVERY EMAIL,PROXY\n";
-//   for (const gmail in groups) {
-//     base += `${gmail.email},${gmail.password},${gmail.recovery},${gmail.proxy}\n`;
-//   }
-//   let dateob = new Date();
-//   fs.writeFileSync(
-//     path.join(
-//       process.env.APPDATA,
-//       "purpl",
-//       "exports",
-//       "gmails",
-//       `gmails (${dateob.getFullYear()}-${("0" + (dateob.getMonth() + 1)).slice(
-//         -2
-//       )}-${("0" + dateob.getDate()).slice(-2)}).csv`
-//     ),
-//     base
-//   );
+const copyGroup = (group) => {
+  const u = uuid.v4();
+  groups[u] = groups[group];
+  groups[u].uuid = u;
+  return u;
+};
 
-//   require("child_process").exec(
-//     `start "" "${path.join(
-//       process.env.APPDATA,
-//       "purpl",
-//       "local-data",
-//       "exports",
-//       "gmails"
-//     )}"`
-//   );
-// };
+//REWRITE THIS!!!
+const exportGmails = () => {
+  let base = "GROUP,EMAIL,PASSWORD,RECOVERY EMAIL,PROXY\n";
+  var groupName;
+  for (const group of Object.values(groups)) {
+    groupName = group.name;
+    for (const gmail of Object.values(group.gmails)) {
+      //@ts-ignore
+      base += `${groupName},${gmail.email},${gmail.password},${gmail.recovery},${gmail.proxy}\n`;
+    }
+  }
+  let dateob = new Date();
+  fs.writeFileSync(
+    path.join(
+      process.env.APPDATA,
+      "purpl",
+      "local-data",
+      "exports",
+      "gmails",
+      `gmails (${dateob.getFullYear()}-${("0" + (dateob.getMonth() + 1)).slice(
+        -2
+      )}-${("0" + dateob.getDate()).slice(-2)}).csv`
+    ),
+    base
+  );
+
+  require("child_process").exec(
+    `start "" "${path.join(
+      process.env.APPDATA,
+      "purpl",
+      "local-data",
+      "exports",
+      "gmails"
+    )}"`
+  );
+};
 
 const saveGmails = (close = false) => {
   return new Promise((resolve, reject) => {
@@ -613,6 +629,7 @@ export {
   saveGmails,
   getGmail,
   editGmail,
+  copyGroup,
   deleteGmail,
   manualLogin,
   testGmail,
@@ -621,5 +638,6 @@ export {
   importFromFile,
   copy,
   sendStatuses,
+  exportGmails,
   deleteAllGmailsInGroup,
 };

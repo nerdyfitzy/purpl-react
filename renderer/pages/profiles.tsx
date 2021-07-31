@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Scrollbars } from "react-custom-scrollbars";
+import {
+  Address,
+  Payment,
+  Prof,
+  Group,
+  FormattedProfile,
+} from "../public/types/profiles";
 
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
 import CreateBtn from "../components/createBtn";
-import TaskGroup from "../components/profiles/taskGroup";
+import TaskGroup from "../components/profiles/profileGroup";
 import BottomBar from "../components/bottomBar";
 import ImExC from "../components/importExportCopy";
 import Profile from "../components/profiles/profile";
-import GroupModal from "../components/harvester/groupModal";
+import GroupModal from "../components/profiles/profGroupModal";
 import ProfileModal from "../components/profiles/addProfile";
+import { ipcRenderer } from "electron";
 
 //this is the harvester for now just to get the hang of it
 
@@ -31,13 +39,77 @@ const gradient = {
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
+export const stateContext = createContext(null);
+
 function Home() {
   const [shown, changeVis] = useState(false);
   const [showProfModal, changeProfModal] = useState(false);
+
+  const [groups, changeGroups] = useState<Array<Group>>([]);
+  const [currentGroup, setCurrentGroup] = useState<string>("default");
+  const [profiles, changeProfiles] = useState<Array<FormattedProfile>>([]);
+  const [selected, addSelected] = useState<Array<string>>([]);
+
+  useEffect(() => {
+    const groups = ipcRenderer.sendSync("load-profiles", {
+      initial: true,
+      group: undefined,
+    });
+    const formattedGroups = Object.values(groups).map((group: any) => ({
+      name: group.name,
+      uuid: group.uuid,
+      total: Object.values(group.profiles).length,
+    }));
+    changeGroups(formattedGroups);
+    if (Object.values(groups["default"].profiles).length > 0) {
+      const profs = ipcRenderer.sendSync("load-profiles", {
+        initial: false,
+        group: "default",
+      });
+      console.log(profs);
+      const formattedProfs = Object.values(profs).map((profile: any) => ({
+        uuid: profile.uuid,
+        name: profile.profile_name,
+        address: profile.shipping.addy1,
+        email: profile.email,
+        type: profile.payment.type,
+        last4: profile.payment.cnb.substring(profile.payment.cnb.length - 4),
+      }));
+
+      changeProfiles(formattedProfs);
+    }
+  }, []);
+
+  const changeStates = [
+    {
+      changeGroups,
+      setCurrentGroup,
+      changeProfiles,
+      addSelected,
+    },
+    {
+      groups,
+      currentGroup,
+      profiles,
+      selected,
+    },
+  ];
+
+  const addGroup = (group: Group) => {
+    changeGroups([...groups, group]);
+  };
+  const copyGroup = () => {};
+  const exportProfiles = () => {};
+  const importProfiles = () => {};
   return (
     <React.Fragment>
       <Actions />
-      <GroupModal shown={shown} handleClose={() => changeVis(false)} />
+      <GroupModal
+        edit={false}
+        shown={shown}
+        handleClose={() => changeVis(false)}
+        handleSubmit={addGroup}
+      />
       <ProfileModal
         shown={showProfModal}
         handleClose={() => changeProfModal(false)}
@@ -71,9 +143,18 @@ function Home() {
                 text='Create Group'
                 handleClick={() => changeVis(true)}
               />
-              <Scrollbars className='' style={{ height: "90%" }} autoHide>
-                <TaskGroup />
-              </Scrollbars>
+              <div className='scrollbars h-4/6'>
+                <stateContext.Provider value={changeStates}>
+                  {groups.map((group) => (
+                    <TaskGroup
+                      name={group.name}
+                      total={group.total}
+                      uuid={group.uuid}
+                      isselected={group.uuid === currentGroup}
+                    />
+                  ))}
+                </stateContext.Provider>
+              </div>
             </div>
 
             <div className='h-full ml-8 w-full'>
@@ -147,31 +228,24 @@ function Home() {
                     Delete All
                   </button>
 
-                  <ImExC />
+                  <ImExC
+                    page='profiles'
+                    handleCopy={copyGroup}
+                    handleExport={exportProfiles}
+                    handleImport={importProfiles}
+                  />
                 </div>
               </div>
-              <div className='flex flex-row flex-wrap'>
-                <Profile
-                  profName='test Prof'
-                  addy='123 Test St.'
-                  email='react@js.org'
-                  last4='1234'
-                  type='MasterCard'
-                />
-                <Profile
-                  profName='test Prof2'
-                  addy='1234 Test St.'
-                  email='react@js.org'
-                  last4='5678'
-                  type='Visa'
-                />
-                <Profile
-                  profName='test Prof3'
-                  addy='1234 Test St.'
-                  email='react@js.org'
-                  last4='5678'
-                  type='Visa'
-                />
+              <div className='flex flex-row flex-wrap scrollbars h-3/6'>
+                {profiles.map((profile) => (
+                  <Profile
+                    profName={profile.name}
+                    addy={profile.address}
+                    last4={profile.last4}
+                    email={profile.email}
+                    type={profile.type}
+                  />
+                ))}
               </div>
             </div>
           </div>

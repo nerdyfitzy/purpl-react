@@ -1,8 +1,9 @@
-import { app, ipcMain, ipcRenderer } from "electron";
+import { app, dialog, ipcMain, ipcRenderer } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import GmailFarmer from "../backend/modules/gmailfarming/index";
 import engine from "../backend/index";
+import ProfileConverter from "../backend/modules/profile maker/index";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -14,6 +15,9 @@ if (isProd) {
 
 (async () => {
   await app.whenReady();
+  app.on("quit", () => {
+    GmailFarmer.saveGmails(true);
+  });
   const code = await engine.setup();
   const mainWindow = createWindow("main", {
     width: 1600,
@@ -114,4 +118,46 @@ ipcMain.on("delete-all-gmails", (event, group) => {
 
 ipcMain.on("action-gmail", (event, { uuid, groupID }) => {
   GmailFarmer.actionSpecific(uuid, groupID, false);
+});
+
+ipcMain.on("import-file", async (event, arg) => {
+  dialog
+    .showOpenDialog({
+      properties: ["openFile"],
+    })
+    .then(async (res) => {
+      const { filePaths } = res;
+      var rt;
+      switch (arg) {
+        case "harvester":
+          rt = await GmailFarmer.importFromFile(filePaths[0]);
+          break;
+        default:
+          event.returnValue = undefined;
+          return;
+      }
+      console.log(rt);
+      event.returnValue = rt;
+    });
+});
+
+ipcMain.on("gmail-export", (event, arg) => {
+  GmailFarmer.exportGmails();
+});
+
+ipcMain.on("copy-gmail-group", (event, group) => {
+  const u = GmailFarmer.copyGroup(group);
+  event.returnValue = u;
+});
+
+ipcMain.on("load-profiles", async (event, { initial, group }) => {
+  event.returnValue = await ProfileConverter.loadProfiles(initial, group);
+});
+
+ipcMain.on("delete-profile-group", (event, uuid) => {
+  ProfileConverter.deleteGroup(uuid);
+});
+
+ipcMain.on("edit-profile-group", (event, { editedUuid, name }) => {
+  ProfileConverter.editGroup(editedUuid, name);
 });

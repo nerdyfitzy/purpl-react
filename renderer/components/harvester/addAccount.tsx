@@ -176,7 +176,7 @@ const AccountModal = ({
               value={proxy}
             />
             <button
-              className='rounded-lg text-center align-middle absolute -bottom-16 right-8 h-10 w-16'
+              className='rounded-lg text-center align-middle absolute -bottom-9 right-8 h-10 w-16'
               style={{ background: "#81C6DC" }}
               onClick={submitData}
             >

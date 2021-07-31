@@ -46,7 +46,7 @@ const Profile = ({
   return (
     <>
       <div
-        className='flex flex-col relative h-32 w-72 px-4 py-4 rounded-lg mr-2'
+        className='flex flex-col mb-2 relative h-32 w-72 px-4 py-4 rounded-lg mr-2'
         style={gradient}
       >
         <div className='font-semibold text-md flex flex-row justify-between w-full'>

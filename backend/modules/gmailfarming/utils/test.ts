@@ -88,4 +88,4 @@ const checkQ = () => {
   }
 };
 
-export { testGmail };
+export default { testGmail };

@@ -17,7 +17,7 @@ import {
   editGroup,
 } from "./converter/converter_main";
 
-export {
+export default {
   loadProfiles,
   getProfile,
   deleteProfile,

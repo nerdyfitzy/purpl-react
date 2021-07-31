@@ -57,6 +57,12 @@ body {
   width: 7px;
 }
 
+.placeholder::placeholder {
+  color: #6f6b75;
+  font-size: small;
+  font-weight: 500;
+}
+
 #modal {
   animation: flyin 0.2s ease-out;
 }

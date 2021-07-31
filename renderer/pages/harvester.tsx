@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { Group, Gmail } from "../public/types/gmails";
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
@@ -30,36 +31,6 @@ const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
-
-interface Group {
-  name: string;
-  uuid: string;
-  total: number;
-  running: number;
-  stopped: number;
-  gmails?: {
-    [k: string]: Gmail;
-  };
-}
-
-interface Gmail {
-  uuid: string;
-  email: string;
-  password?: string;
-  recovery?: string;
-  proxy: string;
-  security?: string;
-  runs?: number;
-  running: boolean;
-  status: string;
-  score: {
-    v3: string | number;
-    v2i: string | boolean;
-    v2v: string | boolean;
-  };
-  groupID?: string;
-  edu?: boolean;
-}
 
 function Home() {
   const [showGroup, changeVis] = useState(false);
@@ -91,6 +62,33 @@ function Home() {
     if (newGroups["default"].gmails !== {}) getGmails("default");
     console.log(groups);
   }, []);
+  const handleImport = (data) => {
+    const g = Object.values(data).map((group: any) => {
+      const running = Object.values(group.gmails).filter(
+        (gmail: Gmail) => gmail.running
+      ).length;
+      return {
+        name: group.name,
+        uuid: group.uuid,
+        total: Object.values(group.gmails).length,
+        running: running,
+        stopped: Object.values(group.gmails).length - running,
+      };
+    });
+    addGroups(g);
+    if (data["default"].gmails !== {}) getGmails("default");
+  };
+
+  const handleExport = () => {
+    ipcRenderer.send("gmail-export");
+  };
+
+  const copyGroup = () => {
+    const u = ipcRenderer.sendSync("copy-gmail-group", currentGroup);
+    let [res] = groups.filter((obj) => obj.uuid === currentGroup);
+    res.uuid = u;
+    addGroups([...groups, res]);
+  };
 
   const getGmails = (id: string) => {
     console.log("getting gmails of", id);
@@ -384,7 +382,12 @@ function Home() {
                     Delete All
                   </button>
 
-                  <ImExC />
+                  <ImExC
+                    page='harvester'
+                    handleImport={handleImport}
+                    handleExport={handleExport}
+                    handleCopy={copyGroup}
+                  />
                 </div>
               </div>
 
