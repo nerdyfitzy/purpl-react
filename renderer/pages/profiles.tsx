@@ -101,6 +101,18 @@ function Home() {
   const copyGroup = () => {};
   const exportProfiles = () => {};
   const importProfiles = () => {};
+  const deleteAllProfiles = () => {
+    ipcRenderer.send("delete-all-profs", currentGroup);
+    changeProfiles([]);
+    let copy = [...groups];
+    let [res] = copy.filter((obj) => obj.uuid === currentGroup);
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      res.total = 0;
+      copy[index] = res;
+      changeGroups(copy);
+    }
+  };
   return (
     <React.Fragment>
       <Actions />
@@ -206,6 +218,7 @@ function Home() {
 
                 <div className='flex flex-row items-center'>
                   <button
+                    onClick={deleteAllProfiles}
                     className='mr-4 flex flex-row justify-evenly items-center w-24 font-medium text-sm'
                     style={{ color: "#6F6B75" }}
                   >
