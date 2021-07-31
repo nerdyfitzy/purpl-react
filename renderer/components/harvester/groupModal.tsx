@@ -37,6 +37,7 @@ const GroupModal = ({
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
+    if (!name) return toast.error("Please fill all required fields!");
     if (!edit) {
       toast.success("Added Group!");
       const newGroup = ipcRenderer.sendSync("new-gmail-group", name);

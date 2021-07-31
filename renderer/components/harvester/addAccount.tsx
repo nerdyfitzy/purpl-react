@@ -61,6 +61,8 @@ const AccountModal = ({
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
+    if (!email || !password)
+      return toast.error("Please fill all required fields!");
     if (!edit) {
       toast.success("Added Account!");
       const newGmail = ipcRenderer.sendSync("new-gmail", {

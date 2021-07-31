@@ -5,6 +5,7 @@ import { Prof } from "../../public/types/profiles";
 import { stateContext } from "../../pages/profiles";
 import { v4 } from "uuid";
 import { ipcRenderer } from "electron";
+import toast from "react-hot-toast";
 
 const inputContext = createContext(null);
 
@@ -452,6 +453,28 @@ const ProfileModal = ({
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
+    if (
+      !profName ||
+      !email ||
+      !sName ||
+      !sPhone ||
+      !sAddy1 ||
+      !sAddy2 ||
+      !sZip ||
+      !sCity ||
+      !sState ||
+      !sCountry ||
+      (!same &&
+        (!bName ||
+          !bAddy1 ||
+          !bAddy2 ||
+          !bCity ||
+          !bState ||
+          !bZip ||
+          !bPhone ||
+          !bCountry))
+    )
+      return toast.error("Please fill all required fields!");
     let profile: Prof = {
       uuid: "",
       profile_name: profName,
