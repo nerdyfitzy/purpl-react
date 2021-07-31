@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import Input from "../styledInput";
 import Select from "react-select";
+import { Prof } from "../../public/types/profiles";
+import { stateContext } from "../../pages/profiles";
+import { v4 } from "uuid";
+import { ipcRenderer } from "electron";
+
+const inputContext = createContext(null);
 
 const topGradient = {
   background:
@@ -78,12 +84,7 @@ const states = [
   { label: "Wyoming", value: "WY" },
 ];
 
-const countries = [
-  { label: "Canada", value: "CA" },
-  { label: "United Kingdom", value: "GB" },
-  { label: "United States", value: "US" },
-  { label: "China", value: "CN" },
-];
+const countries = [{ label: "United States", value: "US" }];
 
 const months = [
   { label: "January", value: "01" },
@@ -136,6 +137,20 @@ const selectStyles = {
 const darken = { background: "rgba(0, 0, 0, 0.6)" };
 
 const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
+  const [
+    { sName, sAddy1, sAddy2, sCity, sState, sCountry, sPhone, sZip },
+    {
+      setSName,
+      setSAddy1,
+      setSAddy2,
+      setSCity,
+      setSState,
+      setSCountry,
+      setSameBilling,
+      setSPhone,
+      setSZip,
+    },
+  ] = useContext(inputContext);
   return (
     <>
       <Input
@@ -143,28 +158,72 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
         title='Name'
         required={true}
         className='mr-1'
+        handleChange={setSName}
+        value={sName}
       />
       <div className='h-24'></div>
 
-      <Input placeholder='Enter address' title='Address' required={true} />
+      <Input
+        placeholder='Enter address'
+        title='Address'
+        required={true}
+        handleChange={setSAddy1}
+        value={sAddy1}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter line 2' title='Line 2' />
+      <Input
+        placeholder='Enter line 2'
+        title='Line 2'
+        handleChange={setSAddy2}
+        value={sAddy2}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter phone number' title='Phone' required={true} />
+      <Input
+        placeholder='Enter phone number'
+        title='Phone'
+        className='relative bottom-5'
+        required={true}
+        handleChange={setSPhone}
+        value={sPhone}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter city' title='City' required={true} />
+      <Input
+        placeholder='Enter city'
+        title='City'
+        required={true}
+        handleChange={setSCity}
+        value={sCity}
+      />
       <div className='h-24'></div>
-      <div className='flex flex-col mr-10'>
+      <Input
+        placeholder='Enter zip'
+        className='absolute right-20 bottom-28'
+        title='Zip code'
+        required={true}
+        handleChange={setSZip}
+        value={sZip}
+      />
+      <div className='flex flex-col mr-10 relative bottom-10'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           State *
         </label>
-        <Select options={states} styles={selectStyles} />
+        <Select
+          options={states}
+          styles={selectStyles}
+          onChange={setSState}
+          value={sState}
+        />
       </div>
       <div className='flex flex-col mr-10'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           Country *
         </label>
-        <Select options={countries} styles={selectStyles} />
+        <Select
+          options={countries}
+          styles={selectStyles}
+          onChange={setSCountry}
+          value={sCountry}
+        />
       </div>
       <div className='flex flex-row items-center absolute bottom-11 right-28'>
         <input type='checkbox' onChange={() => setSame(!same)} checked={same} />
@@ -177,81 +236,174 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
 };
 
 const Billing = () => {
+  const [
+    { bName, bAddy1, bAddy2, bCity, bState, bCountry, bPhone, bZip },
+    {
+      setBName,
+      setBAddy1,
+      setBAddy2,
+      setBCity,
+      setBState,
+      setBCountry,
+      setBPhone,
+      setBZip,
+    },
+  ] = useContext(inputContext);
   return (
     <>
       <Input
         placeholder='Enter name'
         title='Name'
         required={true}
+        handleChange={setBName}
         className='mr-1'
+        value={bName}
       />
       <div className='h-24'></div>
 
-      <Input placeholder='Enter address' title='Address' required={true} />
+      <Input
+        placeholder='Enter address'
+        title='Address'
+        required={true}
+        handleChange={setBAddy1}
+        value={bAddy1}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter line 2' title='Line 2' />
+      <Input
+        placeholder='Enter line 2'
+        title='Line 2'
+        handleChange={setBAddy2}
+        value={bAddy2}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter phone number' title='Phone' required={true} />
+      <Input
+        placeholder='Enter phone number'
+        title='Phone'
+        className='relative bottom-5'
+        required={true}
+        handleChange={setBPhone}
+        value={bPhone}
+      />
       <div className='h-24'></div>
-      <Input placeholder='Enter city' title='City' required={true} />
+      <Input
+        placeholder='Enter city'
+        title='City'
+        required={true}
+        value={bCity}
+        handleChange={setBCity}
+      />
       <div className='h-24'></div>
-      <div className='flex flex-col mr-10'>
+      <Input
+        placeholder='Enter zip'
+        className='absolute right-20 bottom-28'
+        title='Zip code'
+        required={true}
+        handleChange={setBZip}
+        value={bZip}
+      />
+      <div className='flex flex-col mr-10 relative bottom-10'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           State *
         </label>
-        <Select options={states} styles={selectStyles} />
+        <Select
+          options={states}
+          styles={selectStyles}
+          onChange={setBState}
+          value={bState}
+        />
       </div>
       <div className='flex flex-col mr-10'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           Country *
         </label>
-        <Select options={countries} styles={selectStyles} />
+        <Select
+          options={countries}
+          styles={selectStyles}
+          onChange={setBCountry}
+          value={bCountry}
+        />
       </div>
     </>
   );
 };
 
 const Payment = () => {
+  const [
+    { cardName, cardNum, expMonth, expYear, cvv, profName, email },
+    {
+      setCardName,
+      setCardNum,
+      setExpMonth,
+      setExpYear,
+      setCvv,
+      setProfName,
+      setEmail,
+    },
+  ] = useContext(inputContext);
   return (
     <>
       <Input
         placeholder='Enter name on card'
         title='Name on Card'
         required={true}
+        handleChange={setCardName}
+        value={cardName}
       />
       <div className='h-24'></div>
       <Input
         placeholder='Enter card number'
         title='Card Number'
         required={true}
+        handleChange={setCardNum}
+        value={cardNum}
       />
       <div className='h-24'></div>
       <div className='flex flex-col'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           Exp Month *
         </label>
-        <Select options={months} styles={selectStyles} />
+        <Select
+          options={months}
+          styles={selectStyles}
+          value={expMonth}
+          onChange={setExpMonth}
+        />
       </div>
       <div className='h-24'></div>
       <div className='flex flex-col'>
         <label htmlFor='groupName' className='mb-2 text-md font-medium'>
           Exp Year *
         </label>
-        <Select options={years} styles={selectStyles} />
+        <Select
+          options={years}
+          styles={selectStyles}
+          value={expYear}
+          onChange={setExpYear}
+        />
       </div>
       <div className='h-24'></div>
-      <Input placeholder='Enter CVV' title='CVV' required={true} />
+      <Input
+        placeholder='Enter CVV'
+        title='CVV'
+        value={cvv}
+        required={true}
+        handleChange={setCvv}
+      />
       <div className='h-24'></div>
       <Input
         placeholder='Enter email'
         title='Email'
         required={true}
+        value={email}
         className='mr-9'
+        handleChange={setEmail}
       />
       <Input
         placeholder='Enter Profile Name'
         title='Profile Name'
+        value={profName}
         required={true}
+        handleChange={setProfName}
         className='mr-1'
       />
     </>
@@ -267,20 +419,202 @@ const ProfileModal = ({
 }) => {
   const [page, setPage] = useState("Shipping");
   const [same, setSame] = useState(false);
+  const [sName, setSName] = useState("");
+  const [sAddy1, setSAddy1] = useState("");
+  const [sAddy2, setSAddy2] = useState("");
+  const [sCity, setSCity] = useState("");
+  const [sState, setSState] = useState("");
+  const [sCountry, setSCountry] = useState("");
+  const [sPhone, setSPhone] = useState("");
+  const [sZip, setSZip] = useState("");
+
+  const [sameBilling, setSameBilling] = useState(false);
+
+  const [bName, setBName] = useState("");
+  const [bAddy1, setBAddy1] = useState("");
+  const [bAddy2, setBAddy2] = useState("");
+  const [bCity, setBCity] = useState("");
+  const [bState, setBState] = useState("");
+  const [bCountry, setBCountry] = useState("");
+  const [bPhone, setBPhone] = useState("");
+  const [bZip, setBZip] = useState("");
+
+  const [cardName, setCardName] = useState("");
+  const [cardNum, setCardNum] = useState("");
+  const [expMonth, setExpMonth] = useState("");
+  const [expYear, setExpYear] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [email, setEmail] = useState("");
+  const [profName, setProfName] = useState("");
+  const { changeProfiles, currentGroup, profiles } = useContext(stateContext);
   if (!shown) return null;
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
-  function submitData() {}
+  function submitData() {
+    let profile: Prof = {
+      uuid: "",
+      profile_name: profName,
+      email: email,
+      one_checkout: false,
+      shipping: {
+        name: sName,
+        phone: sPhone,
+        addy1: sAddy1,
+        addy2: sAddy2,
+        zip: sZip,
+        city: sCity,
+        state: sState,
+        country: sCountry,
+      },
+      sameBilling: same,
+      billing: same
+        ? {
+            name: sName,
+            phone: sPhone,
+            addy1: sAddy1,
+            addy2: sAddy2,
+            zip: sZip,
+            city: sCity,
+            state: sState,
+            country: sCountry,
+          }
+        : {
+            name: bName,
+            phone: bPhone,
+            addy1: bAddy1,
+            addy2: bAddy2,
+            zip: bZip,
+            city: bCity,
+            state: bState,
+            country: bCountry,
+          },
+      payment: {
+        name: cardName,
+        cnb: cardNum,
+        month: expMonth,
+        year: expYear,
+        cvv: cvv,
+        type: "",
+      },
+    };
+    if (cardNum.charAt(0) === "5") {
+      profile.payment.type = "MasterCard";
+    } else if (cardNum.charAt(0) === "4") {
+      profile.payment.type = "Visa";
+    } else if (profile.payment.cvv.length === 4) {
+      profile.payment.type = "AmericanExpress";
+    } else {
+      profile.payment.type = "Discover";
+    }
+
+    console.log(profile);
+
+    const uuid = ipcRenderer.sendSync("add-profile", {
+      profile,
+      group: currentGroup,
+    });
+    changeProfiles([
+      ...profiles,
+      {
+        uuid,
+        name: profile.profile_name,
+        last4: profile.payment.cnb.substring(profile.payment.cnb.length - 4),
+        address: profile.shipping.addy1,
+        email: profile.email,
+        type: profile.payment.type,
+      },
+    ]);
+  }
 
   function pageHandler() {
     switch (page.toLowerCase()) {
       case "shipping":
-        return <Shipping setSame={setSame} same={same} />;
+        return (
+          <inputContext.Provider
+            value={[
+              {
+                sName,
+                sAddy1,
+                sAddy2,
+                sCity,
+                sState,
+                sCountry,
+                sPhone,
+                sZip,
+              },
+              {
+                setSName,
+                setSAddy1,
+                setSAddy2,
+                setSCity,
+                setSState,
+                setSCountry,
+                setSameBilling,
+                setSPhone,
+                setSZip,
+              },
+            ]}
+          >
+            <Shipping setSame={setSame} same={same} />
+          </inputContext.Provider>
+        );
       case "billing":
-        return <Billing />;
+        return (
+          <inputContext.Provider
+            value={[
+              {
+                bName,
+                bAddy1,
+                bAddy2,
+                bCity,
+                bState,
+                bCountry,
+                bPhone,
+                bZip,
+              },
+              {
+                setBName,
+                setBAddy1,
+                setBAddy2,
+                setBCity,
+                setBState,
+                setBCountry,
+                setBPhone,
+                setBZip,
+              },
+            ]}
+          >
+            <Billing />
+          </inputContext.Provider>
+        );
       case "payment":
-        return <Payment />;
+        return (
+          <inputContext.Provider
+            value={[
+              {
+                cardName,
+                cardNum,
+                expMonth,
+                expYear,
+                cvv,
+                profName,
+                email,
+              },
+              {
+                setCardName,
+                setCardNum,
+                setExpMonth,
+                setExpYear,
+                setCvv,
+                setProfName,
+                setEmail,
+              },
+            ]}
+          >
+            <Payment />
+          </inputContext.Provider>
+        );
     }
   }
   function displayBilling() {
@@ -299,6 +633,7 @@ const ProfileModal = ({
         </>
       );
   }
+
   return (
     <>
       <div
@@ -308,7 +643,7 @@ const ProfileModal = ({
         id='modalBackground'
       >
         <div
-          className='w-2/5 h-3/5 flex flex-col relative rounded-md z-50'
+          className='w-2/5 h-4/5 flex flex-col relative rounded-md z-50'
           style={back}
           id='modal'
         >

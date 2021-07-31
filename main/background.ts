@@ -165,3 +165,7 @@ ipcMain.on("edit-profile-group", (event, { editedUuid, name }) => {
 ipcMain.on("delete-all-profs", (event, uuid) => {
   ProfileConverter.deleteAll(uuid);
 });
+
+ipcMain.on("add-profile", (event, { profile, group }) => {
+  ProfileConverter.addProfile(profile, group);
+});

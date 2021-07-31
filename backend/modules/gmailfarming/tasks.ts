@@ -2,7 +2,7 @@
 import path from "path";
 import fs from "fs";
 import csv from "csv-parser";
-import uuid from "uuid";
+import { v4 } from "uuid";
 import clipboardy from "clipboardy";
 import * as console from "../../utils/logger";
 import test from "./utils/test";
@@ -76,7 +76,7 @@ const copy = (group, gmail, thing) => {
 
 //GROUP FUNCTIONS
 const addGroup = (name, save = true) => {
-  const groupuuid = uuid.v4();
+  const groupuuid = v4();
   groups[groupuuid] = {
     uuid: groupuuid,
     name: name,
@@ -109,7 +109,7 @@ const newGmail = async (
     let proxy = "localhost";
   }
   let gmail: Gmail = {
-    uuid: uuid.v4(),
+    uuid: v4(),
     email: email1,
     password: pass,
     recovery: "",
@@ -551,7 +551,7 @@ const pullFromQueue = () => {
 };
 
 const copyGroup = (group) => {
-  const u = uuid.v4();
+  const u = v4();
   groups[u] = groups[group];
   groups[u].uuid = u;
   return u;

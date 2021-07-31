@@ -122,10 +122,13 @@ function Home() {
         handleClose={() => changeVis(false)}
         handleSubmit={addGroup}
       />
-      <ProfileModal
-        shown={showProfModal}
-        handleClose={() => changeProfModal(false)}
-      />
+      <stateContext.Provider value={{ changeProfiles, currentGroup, profiles }}>
+        <ProfileModal
+          shown={showProfModal}
+          handleClose={() => changeProfModal(false)}
+        />
+      </stateContext.Provider>
+
       <div className='flex h-full'>
         <Navbar page='profiles' />
 
