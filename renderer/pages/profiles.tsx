@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -49,6 +49,16 @@ function Home() {
   const [currentGroup, setCurrentGroup] = useState<string>("default");
   const [profiles, changeProfiles] = useState<Array<FormattedProfile>>([]);
   const [selected, addSelected] = useState<Array<string>>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProfiles, setFilteredProfiles] = useState<
+    Array<FormattedProfile>
+  >([]);
+
+  const searchInput = useRef(null);
+
+  const isFiltered = () => {
+    console.log(searchInput);
+  };
 
   useEffect(() => {
     const groups = ipcRenderer.sendSync("load-profiles", {
@@ -112,6 +122,18 @@ function Home() {
       copy[index] = res;
       changeGroups(copy);
     }
+  };
+  const filterProfs = (e) => {
+    console.log(e.target.value);
+    setSearchTerm(e.target.value);
+    const val = e.target.value;
+    let copy = [...profiles];
+    copy = copy.filter((obj) => {
+      console.log(obj.name, val, obj.name.includes(val));
+      return obj.name.includes(val);
+    });
+    console.log(copy);
+    setFilteredProfiles(copy);
   };
   return (
     <React.Fragment>
@@ -213,8 +235,10 @@ function Home() {
                     <input
                       type='text'
                       placeholder='Search Profiles'
-                      className='w-full'
+                      name='search'
+                      className='w-full my-auto'
                       style={{ background: "#17131d" }}
+                      onChange={(event) => filterProfs(event)}
                     />
                   </div>
                 </div>
@@ -253,15 +277,25 @@ function Home() {
                 </div>
               </div>
               <div className='flex flex-row flex-wrap scrollbars h-3/6'>
-                {profiles.map((profile) => (
-                  <Profile
-                    profName={profile.name}
-                    addy={profile.address}
-                    last4={profile.last4}
-                    email={profile.email}
-                    type={profile.type}
-                  />
-                ))}
+                {searchTerm === ""
+                  ? profiles.map((profile) => (
+                      <Profile
+                        profName={profile.name}
+                        addy={profile.address}
+                        last4={profile.last4}
+                        email={profile.email}
+                        type={profile.type}
+                      />
+                    ))
+                  : filteredProfiles.map((profile) => (
+                      <Profile
+                        profName={profile.name}
+                        addy={profile.address}
+                        last4={profile.last4}
+                        email={profile.email}
+                        type={profile.type}
+                      />
+                    ))}
               </div>
             </div>
           </div>
