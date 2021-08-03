@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { ipcRenderer } from "electron";
+import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 const topGradient = {
@@ -20,22 +21,41 @@ const darken = { background: "rgba(0, 0, 0, 0.6)" };
 const GroupModal = ({
   shown,
   handleClose,
+  handleSubmit,
+  edit = false,
+  editedUuid,
 }: {
   shown: boolean;
   handleClose: any;
+  handleSubmit: any;
+  edit?: boolean;
+  editedUuid?: string;
 }) => {
   if (!shown) return null;
+  const input = useRef(null);
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
-    toast.success("Added Group!");
-    handleClose();
+    if (!edit) {
+      console.log(input);
+      const group = ipcRenderer.sendSync(
+        "add-proxy-group",
+        input.current.value
+      );
+      handleSubmit({ name: group.name, uuid: group.uuid, total: 0 });
+      toast.success("Added Group!");
+      handleClose();
+    } else {
+      console.log("editing");
+      handleClose();
+      handleSubmit(input.current.value);
+    }
   }
   return (
     <>
       <div
-        className='w-full h-full flex justify-center items-center absolute z-30'
+        className='w-full h-full flex justify-center items-center top-0 left-0 absolute z-30'
         style={darken}
         onClick={handleClick}
         id='modalBackground'
@@ -76,6 +96,7 @@ const GroupModal = ({
                 Group Name
               </label>
               <input
+                ref={input}
                 id='groupName'
                 type='text'
                 className='rounded-lg w-56 h-12 text-left px-4 text-xs font-medium '

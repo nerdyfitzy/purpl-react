@@ -56,6 +56,7 @@ const loadProxies = async (fromfile, group) => {
       `[${new Date().toLocaleTimeString()}] - Loading Group ` + group
     );
     if (typeof group === "undefined") return groups;
+    if (typeof groups[group] === "undefined") return undefined;
     return groups[group].proxies;
   }
 };

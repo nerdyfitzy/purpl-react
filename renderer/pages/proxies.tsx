@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -7,7 +7,7 @@ import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
 import CreateBtn from "../components/createBtn";
-import TaskGroup from "../components/proxies/proxyGroup";
+import ProxyGroup from "../components/proxies/proxyGroup";
 import Header from "../components/harvester/header";
 import Proxy from "../components/proxies/proxy";
 import BottomBar from "../components/bottomBar";
@@ -15,6 +15,8 @@ import ImExC from "../components/importExportCopy";
 import Profile from "../components/profiles/profile";
 import GroupModal from "../components/proxies/addProxyGroup";
 import ProxyModal from "../components/proxies/addProxies";
+import { Group, ProxyType, FormattedGroup } from "../public/types/proxies";
+import { ipcRenderer } from "electron";
 
 //this is the harvester for now just to get the hang of it
 
@@ -33,17 +35,67 @@ const gradient = {
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
+export const stateContext = createContext(null);
+
 function Home() {
   const [showGroup, changeVis] = useState(false);
   const [showProxy, changePModal] = useState(false);
+
+  const [groups, changeGroups] = useState<Array<FormattedGroup>>([]);
+  const [currentGroup, setCurrentGroup] = useState<string>("default");
+  const [proxies, changeProxies] = useState<Array<ProxyType>>([]);
+  const [selected, addSelected] = useState<Array<string>>([]);
+
+  const changeStates = [
+    { changeGroups, setCurrentGroup, changeProxies, addSelected },
+    { groups, currentGroup, proxies, selected },
+  ];
+
+  useEffect(() => {
+    const proxies = ipcRenderer.sendSync("load-proxies", {
+      initial: true,
+      group: undefined,
+    });
+    const formattedGroups = Object.values(proxies).map((group: Group) => {
+      const total = Object.values(group.proxies).length;
+      console.log(group);
+      return {
+        name: group.name,
+        uuid: group.uuid,
+        total: total,
+      };
+    });
+    changeGroups(formattedGroups);
+    if (Object.values(proxies["default"].proxies).length > 0) {
+      const proxies: { [k: string]: ProxyType } = ipcRenderer.sendSync(
+        "load-proxies",
+        {
+          initial: false,
+          group: "default",
+        }
+      );
+      const formattedProxies = Object.values(proxies);
+
+      changeProxies(formattedProxies);
+    }
+  }, []);
+
   const isBlurred = () => {
     if (showGroup || showProxy) return { filter: "blur(3px)" };
     return {};
   };
+
+  const addGroup = (group: FormattedGroup) => {
+    changeGroups([...groups, group]);
+  };
   return (
     <React.Fragment>
       <Actions />
-      <GroupModal shown={showGroup} handleClose={() => changeVis(false)} />
+      <GroupModal
+        shown={showGroup}
+        handleClose={() => changeVis(false)}
+        handleSubmit={addGroup}
+      />
       <ProxyModal shown={showProxy} handleClose={() => changePModal(false)} />
       <div className='flex h-full' style={isBlurred()}>
         <Navbar page='proxies' />
@@ -74,8 +126,17 @@ function Home() {
                 text='Create Group'
                 handleClick={() => changeVis(true)}
               />
-              <div className='scrollbars' style={{ height: "90%" }}>
-                <TaskGroup />
+              <div className='scrollbars' style={{ height: "60%" }}>
+                <stateContext.Provider value={changeStates}>
+                  {groups.map((group) => (
+                    <ProxyGroup
+                      total={group.total}
+                      name={group.name}
+                      uuid={group.uuid}
+                      isSelected={group.uuid === currentGroup}
+                    />
+                  ))}
+                </stateContext.Provider>
               </div>
             </div>
 
@@ -222,14 +283,24 @@ function Home() {
                     Actions
                   </div>
                 </div>
-                <div className='scrollbars'>
-                  <Proxy
-                    ip='127.0.0.1'
-                    port='8888'
-                    user='nerdy'
-                    pass='fitzy'
-                    speed={0}
-                  />
+                <div className='scrollbars' style={{ height: "340px" }}>
+                  <stateContext.Provider
+                    value={{ addSelected, changeProxies, proxies, selected }}
+                  >
+                    {proxies.map((proxy) => {
+                      const [ip, port, user, pass] = proxy.proxy.split(":");
+                      return (
+                        <Proxy
+                          ip={ip}
+                          port={port}
+                          user={user}
+                          pass={pass}
+                          speed={proxy.speed}
+                          uuid={proxy.uuid}
+                        />
+                      );
+                    })}
+                  </stateContext.Provider>
                 </div>
               </div>
             </div>

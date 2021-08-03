@@ -1,19 +1,95 @@
-import React from "react";
+import { ipcRenderer } from "electron";
+import React, { useContext, useState } from "react";
+import { stateContext } from "../../pages/proxies";
+import { ProxyType } from "../../public/types/proxies";
+import ProxyGroup from "./addProxyGroup";
+import toast from "react-hot-toast";
 
 const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
 
-const TaskGroup = () => {
+const selectedClasses = {
+  background:
+    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  borderWidth: "2px",
+  borderColor: "rgba(181, 132, 255, 1)",
+};
+
+const TaskGroup = ({
+  name,
+  uuid,
+  total,
+  isSelected,
+}: {
+  name: string;
+  uuid: string;
+  total: number;
+  isSelected: boolean;
+}) => {
+  console.log(name, uuid, total, isSelected);
+  const [shown, changeVis] = useState(false);
+  const [
+    { changeGroups, setCurrentGroup, changeProxies, addSelected },
+    { groups, currentGroup, proxies, selected },
+  ] = useContext(stateContext);
+  const selectGroup = () => {
+    setCurrentGroup(uuid);
+    addSelected([]);
+    const proxies: { [k: string]: ProxyType } = ipcRenderer.sendSync(
+      "load-proxies",
+      {
+        initial: false,
+        group: uuid,
+      }
+    );
+    if (typeof proxies === "undefined") return;
+    console.log(proxies);
+    const newProxies = Object.values(proxies);
+
+    changeProxies(newProxies);
+  };
+  const getSelectedClasses = () => {
+    if (isSelected) return selectedClasses;
+    return gradient;
+  };
+  const editGroup = (newName) => {
+    let copy = [...groups];
+    let [res] = copy.filter((obj) => obj.uuid === uuid);
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      ipcRenderer.send("edit-proxy-group", { uuid, name: newName });
+      res.name = newName;
+      copy[index] = res;
+      changeGroups(copy);
+      toast.success("Edited Group!");
+    }
+  };
+  const deleteGroup = () => {
+    ipcRenderer.send("delete-proxy-group", uuid);
+    let copy = [...groups];
+    let res = copy.filter((obj) => obj.uuid !== uuid);
+    changeGroups(res);
+    toast.success("Deleted Group!");
+  };
   return (
     <>
+      <ProxyGroup
+        shown={shown}
+        edit={true}
+        editedUuid={uuid}
+        handleClose={() => changeVis(false)}
+        handleSubmit={editGroup}
+      ></ProxyGroup>
       <div
-        className='flex flex-col justify-between h-36 w-10/12 rounded-lg p-5 relative'
-        style={gradient}
+        className='flex flex-col mb-4 justify-between h-36 w-10/12 rounded-lg p-5 relative'
+        style={getSelectedClasses()}
+        id={uuid}
+        onClick={selectGroup}
       >
         <div className='font-semibold text-md'>
-          Da group
+          {name}
           <div
             className='text-sm font-medium mt-1'
             style={{ color: "#6F6B75" }}
@@ -54,11 +130,11 @@ const TaskGroup = () => {
                 fill='#C29EFA'
               />
             </svg>
-            69 Proxies
+            {total} Proxies
           </div>
         </div>
 
-        <a className='absolute bottom-5 right-5'>
+        <button className='absolute bottom-5 right-5' onClick={deleteGroup}>
           <svg
             width='18'
             height='18'
@@ -77,9 +153,12 @@ const TaskGroup = () => {
               />
             </g>
           </svg>
-        </a>
+        </button>
 
-        <a className='absolute bottom-5 right-16'>
+        <button
+          className='absolute bottom-5 right-16'
+          onClick={() => changeVis(true)}
+        >
           <svg
             width='18'
             height='18'
@@ -98,7 +177,7 @@ const TaskGroup = () => {
               />
             </g>
           </svg>
-        </a>
+        </button>
       </div>
     </>
   );

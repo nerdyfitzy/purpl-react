@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
+import { stateContext } from "../../pages/proxies";
 
 const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+};
+
+const selectedClasses = {
+  background:
+    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  borderWidth: "2px",
+  borderColor: "rgba(181, 132, 255, 1)",
 };
 
 const Proxy = ({
@@ -11,25 +19,47 @@ const Proxy = ({
   user,
   pass,
   speed,
+  uuid,
 }: {
   ip: string;
   port: string;
   user: string;
   pass: string;
-  speed: number;
+  speed: number | string;
+  uuid: string;
 }) => {
+  const { addSelected, changeProxies, proxies, selected } =
+    useContext(stateContext);
   const classes = `text-sm font-medium w-1/5 mr-5 overflow-hidden`;
+  const selectProxy = () => {
+    if (!selected.includes(uuid)) {
+      if (selected.length === 0) addSelected([uuid]);
+      else addSelected([...selected, uuid]);
+    } else {
+      const index = selected.indexOf(uuid);
+      addSelected(selected.splice(index, 1));
+    }
+    console.log(selected);
+  };
+  const getSelectedClasses = () => {
+    if (selected.includes(uuid)) return selectedClasses;
+    return gradient;
+  };
   return (
     <>
       <div
-        style={gradient}
+        style={getSelectedClasses()}
+        id={uuid}
+        onClick={selectProxy}
         className='flex flex-row px-6 items-center rounded-lg h-16 w-11/12 mt-5'
       >
         <div className={classes}>{ip}</div>
         <div className={classes}>{port}</div>
         <div className={classes}>{user}</div>
         <div className={classes}>{pass}</div>
-        <div className={classes}>{speed}ms</div>
+        <div className={classes}>
+          {speed === "Untested" ? speed : `${speed}ms`}
+        </div>
         <div className='flex flex-row'>
           <button className='mx-2'>
             <svg

@@ -12,7 +12,7 @@ import {
   setSpeed,
 } from "./proxies";
 
-export {
+export default {
   addGroup,
   editGroup,
   loadProxies,

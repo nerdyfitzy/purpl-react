@@ -4,6 +4,7 @@ import { createWindow } from "./helpers";
 import GmailFarmer from "../backend/modules/gmailfarming/index";
 import engine from "../backend/index";
 import ProfileConverter from "../backend/modules/profile maker/index";
+import Proxies from "../backend/modules/proxies/index";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -168,4 +169,20 @@ ipcMain.on("delete-all-profs", (event, uuid) => {
 
 ipcMain.on("add-profile", (event, { profile, group }) => {
   ProfileConverter.addProfile(profile, group);
+});
+
+ipcMain.on("load-proxies", async (event, { initial, group }) => {
+  event.returnValue = await Proxies.loadProxies(initial, group);
+});
+
+ipcMain.on("add-proxy-group", async (event, name) => {
+  event.returnValue = await Proxies.addGroup(name);
+});
+
+ipcMain.on("edit-proxy-group", (event, { uuid, name }) => {
+  Proxies.editGroup(name, uuid);
+});
+
+ipcMain.on("delete-proxy-group", (event, uuid) => {
+  Proxies.deleteGroup(uuid);
 });

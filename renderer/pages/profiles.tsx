@@ -56,10 +56,6 @@ function Home() {
 
   const searchInput = useRef(null);
 
-  const isFiltered = () => {
-    console.log(searchInput);
-  };
-
   useEffect(() => {
     const groups = ipcRenderer.sendSync("load-profiles", {
       initial: true,
