@@ -87,7 +87,7 @@ const GroupModal = ({
               className='absolute top-8 left-12 text-md font-semibold p-2 w-1/5'
               style={botBorder}
             >
-              Add Group
+              {edit ? "Edit" : "Add"} Group
             </div>
           </div>
           <div className='modalBottom relative'>

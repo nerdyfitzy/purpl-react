@@ -186,3 +186,7 @@ ipcMain.on("edit-proxy-group", (event, { uuid, name }) => {
 ipcMain.on("delete-proxy-group", (event, uuid) => {
   Proxies.deleteGroup(uuid);
 });
+
+ipcMain.on("delete-all-proxies", (event, group) => {
+  Proxies.deleteAll(group);
+});

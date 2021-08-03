@@ -88,6 +88,10 @@ function Home() {
   const addGroup = (group: FormattedGroup) => {
     changeGroups([...groups, group]);
   };
+  const deleteAll = () => {
+    ipcRenderer.sendSync("delete-all-proxies", currentGroup);
+    changeProxies([]);
+  };
   return (
     <React.Fragment>
       <Actions />
@@ -160,6 +164,7 @@ function Home() {
                   <button
                     className='mr-4 flex flex-row justify-evenly items-center w-24 font-medium text-sm'
                     style={{ color: "#6F6B75" }}
+                    onClick={deleteAll}
                   >
                     <svg
                       width='15'
@@ -283,7 +288,7 @@ function Home() {
                     Actions
                   </div>
                 </div>
-                <div className='scrollbars' style={{ height: "340px" }}>
+                <div className='scrollbars h-3/6'>
                   <stateContext.Provider
                     value={{ addSelected, changeProxies, proxies, selected }}
                   >
