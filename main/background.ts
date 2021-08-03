@@ -190,3 +190,21 @@ ipcMain.on("delete-proxy-group", (event, uuid) => {
 ipcMain.on("delete-all-proxies", (event, group) => {
   Proxies.deleteAll(group);
 });
+
+ipcMain.on(
+  "action-sel-gmails",
+  (event, { selected, group }: { selected: Array<string>; group: string }) => {
+    for (const id of selected) {
+      GmailFarmer.actionSpecific(id, group, false);
+    }
+  }
+);
+
+ipcMain.on("test-sel-gmails", async (event, { selected, group, type }) => {
+  let results = [];
+  for (const id of selected) {
+    await GmailFarmer.testGmail(id, group, type);
+  }
+
+  event.reply("test-gmails-reply", 1);
+});

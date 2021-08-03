@@ -506,14 +506,15 @@ const testGmail = async (uuid, group, type) => {
       `[${new Date().toLocaleTimeString()}] - Got result ${parsedResult}`,
       "debug"
     );
-    if (type === "v2v") {
-      groups[group].gmails[uuid].score.v2v = parsedResult.score;
-    } else if (type === "v2i") {
-      groups[group].gmails[uuid].score.v2i = parsedResult.score;
-    } else if (type === "v3") {
-      groups[group].gmails[uuid].score.v3 = parsedResult.score;
+    if (!parsedResult.errors) {
+      if (type === "v2v") {
+        groups[group].gmails[uuid].score.v2v = parsedResult.score;
+      } else if (type === "v2i") {
+        groups[group].gmails[uuid].score.v2i = parsedResult.score;
+      } else if (type === "v3") {
+        groups[group].gmails[uuid].score.v3 = parsedResult.score;
+      }
     }
-
     saveGmails();
     return parsedResult;
   });

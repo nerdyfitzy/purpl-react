@@ -237,6 +237,70 @@ function Home() {
     }
   };
 
+  const startSel = () => {
+    if (selected.length > 0) {
+      let copy = [...gmails];
+      const starting = selected.filter((uuid) => {
+        const [item] = copy.filter((obj) => obj.uuid === uuid);
+        if (!item.running) {
+          copy[copy.indexOf(item)].running = true;
+          return true;
+        }
+        return false;
+      });
+      ipcRenderer.send("action-sel-gmails", {
+        selected: starting,
+        group: currentGroup,
+      });
+      const inc = Object.values(gmails).map(
+        (gmail) => !gmail.running && selected.includes(gmail.uuid)
+      ).length;
+      incStartNumber(currentGroup, inc, false);
+      incStopNumber(currentGroup, -inc, false);
+      addSelected([]);
+      addGmails(copy);
+    }
+  };
+  const stopSel = () => {
+    if (selected.length > 0) {
+      let copy = [...gmails];
+      const stopping = selected.filter((uuid) => {
+        const [item] = copy.filter((obj) => obj.uuid === uuid);
+        if (item.running) {
+          copy[copy.indexOf(item)].running = false;
+          return true;
+        }
+        return false;
+      });
+      ipcRenderer.send("action-sel-gmails", {
+        selected: stopping,
+        group: currentGroup,
+      });
+      const inc = Object.values(gmails).map(
+        (gmail) => gmail.running && selected.includes(gmail.uuid)
+      ).length;
+      incStopNumber(currentGroup, inc, false);
+      incStartNumber(currentGroup, -inc, false);
+      addSelected([]);
+      addGmails(copy);
+    }
+  };
+  const test = (type) => {
+    if (selected.length > 0) {
+      stopSel();
+      ipcRenderer.send("test-sel-gmails", {
+        selected,
+        group: currentGroup,
+        type,
+      });
+      addSelected([]);
+    }
+  };
+
+  ipcRenderer.on("test-gmails-reply", (event, arg) => {
+    getGmails(currentGroup);
+  });
+
   const isBlurred = () => {
     if (showGroup || showAccount) return { filter: "blur(3px)" };
     return {};
@@ -448,6 +512,9 @@ function Home() {
                       status={gmail.status}
                       running={gmail.running}
                       handleStart={handleGmailAction}
+                      startSel={startSel}
+                      stopSel={stopSel}
+                      test={test}
                     />
                   ))}
                 </div>

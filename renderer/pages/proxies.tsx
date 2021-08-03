@@ -90,6 +90,13 @@ function Home() {
   };
   const deleteAll = () => {
     ipcRenderer.sendSync("delete-all-proxies", currentGroup);
+    let [res] = groups.filter((obj) => obj.uuid === currentGroup);
+    let copy = [...groups];
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      copy[index].total = 0;
+      changeGroups(copy);
+    }
     changeProxies([]);
   };
   return (
@@ -288,7 +295,7 @@ function Home() {
                     Actions
                   </div>
                 </div>
-                <div className='scrollbars h-3/6'>
+                <div className='scrollbars' style={{ height: "45vh" }}>
                   <stateContext.Provider
                     value={{ addSelected, changeProxies, proxies, selected }}
                   >
