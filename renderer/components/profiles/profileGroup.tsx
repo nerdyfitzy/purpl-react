@@ -1,5 +1,6 @@
 import { ipcRenderer } from "electron";
 import React, { useContext, useState } from "react";
+import toast from "react-hot-toast";
 import { stateContext } from "../../pages/profiles";
 import { Prof, Group } from "../../public/types/profiles";
 import GroupModal from "./profGroupModal";
@@ -68,6 +69,7 @@ const TaskGroup = ({
   };
   const deleteGroup = () => {
     ipcRenderer.send("delete-profile-group", uuid);
+    toast.success("Deleted Group!");
     let copy = [...groups];
     let [res] = groups.filter((obj) => obj.uuid === uuid);
     const index = copy.indexOf(res);

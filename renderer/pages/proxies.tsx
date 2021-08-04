@@ -17,6 +17,7 @@ import GroupModal from "../components/proxies/addProxyGroup";
 import ProxyModal from "../components/proxies/addProxies";
 import { Group, ProxyType, FormattedGroup } from "../public/types/proxies";
 import { ipcRenderer } from "electron";
+import Filter from "../components/proxies/filters";
 
 //this is the harvester for now just to get the hang of it
 
@@ -44,6 +45,7 @@ function Home() {
   const [groups, changeGroups] = useState<Array<FormattedGroup>>([]);
   const [currentGroup, setCurrentGroup] = useState<string>("default");
   const [proxies, changeProxies] = useState<Array<ProxyType>>([]);
+  const [filteredProxies, setFilteredProxies] = useState<Array<ProxyType>>([]);
   const [selected, addSelected] = useState<Array<string>>([]);
 
   const changeStates = [
@@ -99,6 +101,30 @@ function Home() {
     }
     changeProxies([]);
   };
+
+  const filterProxies = (filterType: string) => {
+    let c = [...proxies];
+    const newProxies = c.filter((proxy) => {
+      switch (filterType) {
+        case "All Proxies":
+          return true;
+        case "<500ms":
+          if (proxy.speed < 500) return true;
+          else return false;
+        case "500-1000ms":
+          if (proxy.speed > 500 && proxy.speed < 1000) return true;
+          else return false;
+        case "1000-2000ms":
+          if (proxy.speed > 1000 && proxy.speed < 2000) return true;
+          else return false;
+        case "2000ms+":
+          if (proxy.speed >= 2000) return true;
+          else return false;
+      }
+    });
+    console.log(newProxies, filterType);
+    setFilteredProxies(newProxies);
+  };
   return (
     <React.Fragment>
       <Actions />
@@ -151,7 +177,42 @@ function Home() {
               </div>
             </div>
 
-            <div className='h-full ml-8 w-full'>
+            <div className='h-full ml-8 w-full relative'>
+              <div className='absolute right-0 top-0 flex flex-row m-4'>
+                <Filter
+                  filterName='All Proxies'
+                  num={proxies.length}
+                  handleFilter={(t) => filterProxies(t)}
+                />
+                <Filter
+                  filterName='<500ms'
+                  num={proxies.filter((prox) => prox.speed < 500).length}
+                  handleFilter={(t) => filterProxies(t)}
+                />
+                <Filter
+                  filterName='500-1000ms'
+                  num={
+                    proxies.filter(
+                      (prox) => prox.speed > 500 && prox.speed < 1000
+                    ).length
+                  }
+                  handleFilter={(t) => filterProxies(t)}
+                />
+                <Filter
+                  filterName='1000-2000ms'
+                  num={
+                    proxies.filter(
+                      (prox) => prox.speed > 1000 && prox.speed < 2000
+                    ).length
+                  }
+                  handleFilter={(t) => filterProxies(t)}
+                />
+                <Filter
+                  filterName='2000ms+'
+                  num={proxies.filter((prox) => prox.speed > 2000).length}
+                  handleFilter={(t) => filterProxies(t)}
+                />
+              </div>
               <div
                 className='font-semibold text-sm mt-8'
                 style={{ color: "#6F6B75" }}
@@ -299,19 +360,35 @@ function Home() {
                   <stateContext.Provider
                     value={{ addSelected, changeProxies, proxies, selected }}
                   >
-                    {proxies.map((proxy) => {
-                      const [ip, port, user, pass] = proxy.proxy.split(":");
-                      return (
-                        <Proxy
-                          ip={ip}
-                          port={port}
-                          user={user}
-                          pass={pass}
-                          speed={proxy.speed}
-                          uuid={proxy.uuid}
-                        />
-                      );
-                    })}
+                    {filteredProxies.length === 0
+                      ? proxies.map((proxy) => {
+                          const [ip, port, user, pass] = proxy.proxy.split(":");
+                          return (
+                            <Proxy
+                              ip={ip}
+                              port={port}
+                              user={user}
+                              pass={pass}
+                              speed={proxy.speed}
+                              uuid={proxy.uuid}
+                              isSelected={selected.includes(proxy.uuid)}
+                            />
+                          );
+                        })
+                      : filteredProxies.map((proxy) => {
+                          const [ip, port, user, pass] = proxy.proxy.split(":");
+                          return (
+                            <Proxy
+                              ip={ip}
+                              port={port}
+                              user={user}
+                              pass={pass}
+                              speed={proxy.speed}
+                              uuid={proxy.uuid}
+                              isSelected={selected.includes(proxy.uuid)}
+                            />
+                          );
+                        })}
                   </stateContext.Provider>
                 </div>
               </div>

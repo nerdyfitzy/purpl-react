@@ -20,6 +20,7 @@ const Proxy = ({
   pass,
   speed,
   uuid,
+  isSelected,
 }: {
   ip: string;
   port: string;
@@ -27,22 +28,23 @@ const Proxy = ({
   pass: string;
   speed: number | string;
   uuid: string;
+  isSelected: boolean;
 }) => {
   const { addSelected, changeProxies, proxies, selected } =
     useContext(stateContext);
   const classes = `text-sm font-medium w-20 mr-16 overflow-hidden `;
   const selectProxy = () => {
     if (!selected.includes(uuid)) {
-      if (selected.length === 0) addSelected([uuid]);
-      else addSelected([...selected, uuid]);
+      addSelected([...selected, uuid]);
     } else {
-      const index = selected.indexOf(uuid);
-      addSelected(selected.splice(index, 1));
+      let copy = [...selected];
+      copy.splice(copy.indexOf(uuid), 1);
+      addSelected(copy);
     }
     console.log(selected);
   };
   const getSelectedClasses = () => {
-    if (selected.includes(uuid)) return selectedClasses;
+    if (isSelected) return selectedClasses;
     return gradient;
   };
   return (
