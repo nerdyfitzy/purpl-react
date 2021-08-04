@@ -21,6 +21,7 @@ import Profile from "../components/profiles/profile";
 import GroupModal from "../components/profiles/profGroupModal";
 import ProfileModal from "../components/profiles/addProfile";
 import { ipcRenderer } from "electron";
+import toast from "react-hot-toast";
 
 //this is the harvester for now just to get the hang of it
 
@@ -104,11 +105,29 @@ function Home() {
   const addGroup = (group: Group) => {
     changeGroups([...groups, group]);
   };
-  const copyGroup = () => {};
+  const copyGroup = () => {
+    if (selected.length > 0) {
+      let newProfiles = ipcRenderer.sendSync("copy-profiles", {
+        profiles: selected,
+        group: currentGroup,
+      });
+      toast.success("Copied Selected Profiles!");
+      newProfiles = newProfiles.map((prof: Prof) => ({
+        uuid: prof.uuid,
+        name: prof.profile_name,
+        address: prof.shipping.addy1,
+        email: prof.email,
+        last4: prof.payment.cnb.substring(prof.payment.cnb.length - 4),
+        type: prof.payment.type,
+      }));
+      changeProfiles([...profiles, ...newProfiles]);
+    }
+  };
   const exportProfiles = () => {};
   const importProfiles = () => {};
   const deleteAllProfiles = () => {
     ipcRenderer.send("delete-all-profs", currentGroup);
+    toast.success("Deleted All Profiles!");
     changeProfiles([]);
     let copy = [...groups];
     let [res] = copy.filter((obj) => obj.uuid === currentGroup);
@@ -196,6 +215,12 @@ function Home() {
                 style={{ color: "#6F6B75" }}
               >
                 LIST
+                <div
+                  className='font-semibold text-sm mt-8'
+                  style={{ color: "#6F6B75" }}
+                >
+                  Selected
+                </div>
               </div>
 
               <div className='flex flex-row justify-between w-full items-center'>

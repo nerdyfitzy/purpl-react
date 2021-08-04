@@ -413,7 +413,7 @@ const editProfile = (group, uuid, newProf) => {
 const copyProfiles = async (profiles, group) => {
   let newU = new Array();
   for (const profile of profiles) {
-    const u = await addProfile(groups[group].profiles[profile], group);
+    const u = await addProfile({ ...groups[group].profiles[profile] }, group);
     newU.push(groups[group].profiles[u]);
   }
   saveProfiles();

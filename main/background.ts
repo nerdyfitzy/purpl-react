@@ -221,3 +221,8 @@ ipcMain.on("edit-profile", (event, { group, uuid, newProf }) => {
 ipcMain.on("delete-profile", (event, { group, uuid }) => {
   ProfileConverter.deleteProfile(uuid, group);
 });
+
+ipcMain.on("copy-profiles", async (event, { profiles, group }) => {
+  const newprf = await ProfileConverter.copyProfiles(profiles, group);
+  event.returnValue = newprf;
+});
