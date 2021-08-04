@@ -233,3 +233,7 @@ ipcMain.on(
     ProfileConverter.deleteSelected(profiles, group);
   }
 );
+
+ipcMain.on("delete-proxy", (event, { group, uuid }) => {
+  Proxies.deleteProxy(uuid, group);
+});

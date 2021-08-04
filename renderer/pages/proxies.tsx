@@ -374,7 +374,15 @@ function Home() {
                 </div>
                 <div className='scrollbars' style={{ height: "45vh" }}>
                   <stateContext.Provider
-                    value={{ addSelected, changeProxies, proxies, selected }}
+                    value={{
+                      addSelected,
+                      changeProxies,
+                      proxies,
+                      selected,
+                      currentGroup,
+                      groups,
+                      changeGroups,
+                    }}
                   >
                     {filteredProxies.length === 0 &&
                     currentFilter === "All Proxies"

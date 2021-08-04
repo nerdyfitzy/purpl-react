@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { stateContext } from "../../pages/proxies";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
+import { ipcRenderer } from "electron";
 
 const gradient = {
   background:
@@ -31,8 +32,15 @@ const Proxy = ({
   uuid: string;
   isSelected: boolean;
 }) => {
-  const { addSelected, changeProxies, proxies, selected } =
-    useContext(stateContext);
+  const {
+    addSelected,
+    changeProxies,
+    proxies,
+    selected,
+    currentGroup,
+    groups,
+    changeGroups,
+  } = useContext(stateContext);
   const classes = `text-sm font-medium w-20 mr-16 overflow-hidden `;
   const selectProxy = () => {
     if (!selected.includes(uuid)) {
@@ -47,6 +55,17 @@ const Proxy = ({
   const getSelectedClasses = () => {
     if (isSelected) return selectedClasses;
     return gradient;
+  };
+  const deleteProxy = () => {
+    ipcRenderer.send("delete-proxy", { group: currentGroup, uuid });
+    let c = proxies.filter((proxy) => proxy.uuid !== uuid);
+    let g = groups.filter((group) => {
+      if (group.uuid === currentGroup) --group.total;
+
+      return true;
+    });
+    changeGroups(g);
+    changeProxies(c);
   };
   return (
     <>
@@ -67,7 +86,7 @@ const Proxy = ({
             {speed === "Untested" ? speed : `${speed}ms`}
           </div>
           <div className='flex flex-row '>
-            <button>
+            <button onClick={deleteProxy}>
               <svg
                 width='20'
                 height='20'
