@@ -405,6 +405,11 @@ const editGroup = (uuid, name) => {
   saveProfiles();
 };
 
+const editProfile = (group, uuid, newProf) => {
+  groups[group].profiles[uuid] = newProf;
+  saveProfiles();
+};
+
 const copyProfiles = async (profiles, group) => {
   let newU = new Array();
   for (const profile of profiles) {
@@ -458,4 +463,5 @@ export {
   jigProfiles,
   getProfile,
   editGroup,
+  editProfile,
 };

@@ -11,6 +11,7 @@ const Actions = () => {
   }
 
   function closeWindow() {
+    console.log("close");
     const WIN = remote.getCurrentWindow();
     WIN.close();
   }
@@ -18,8 +19,8 @@ const Actions = () => {
   return (
     <>
       <Toaster position='bottom-right' />
-      <div className='absolute left-0 top-0 h-10 flex flex-row z-30 justify-end items-center w-full drag'>
-        <button onClick={minimizeWindow} className=''>
+      <div className='absolute left-0 top-0 h-10 flex flex-row  z-30 justify-end items-center w-11/12 drag'>
+        <button onClick={minimizeWindow} className='relative left-28'>
           <svg
             className='mx-2 my-4'
             width='15'
@@ -34,7 +35,7 @@ const Actions = () => {
             />
           </svg>
         </button>
-        <button onClick={closeWindow} className='mr-5'>
+        <button onClick={closeWindow} className='relative left-28'>
           <svg
             width='15'
             height='15'

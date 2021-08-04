@@ -1,13 +1,23 @@
-import React from "react";
+import React, { createContext, useContext, useState } from "react";
+import { stateContext } from "../../pages/profiles";
+import ProfileModal from "./addProfile";
 
 const gradient = {
   background:
     "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
 };
+const selectedClasses = {
+  background:
+    "linear-gradient(97.17deg, #332E3A 13.22%, rgba(51, 46, 58, 0) 127.05%)",
+  borderWidth: "2px",
+  borderColor: "rgba(181, 132, 255, 1)",
+};
 
 const greyText = {
   color: "#6F6B75",
 };
+
+export const modalContext = createContext(null);
 
 const Profile = ({
   profName,
@@ -15,13 +25,22 @@ const Profile = ({
   email,
   last4,
   type,
+  uuid,
+  isSelected,
 }: {
   profName: string;
   addy: string;
   email: string;
   last4: string;
   type: string;
+  uuid: string;
+  isSelected: boolean;
 }) => {
+  const [shown, changeVis] = useState(false);
+  const [
+    { changeGroups, setCurrentGroup, changeProfiles, addSelected },
+    { groups, currentGroup, profiles, selected },
+  ] = useContext(stateContext);
   function Dot() {
     return (
       <div
@@ -37,22 +56,49 @@ const Profile = ({
         return "/images/mastercard.png";
       case "Visa":
         return "/images/visa.png";
+      case "AmericanExpress":
+        return "/images/amex.png";
       default:
         return "/images/mastercard.png";
     }
   }
 
+  const selectProf = () => {
+    if (!selected.includes(uuid)) {
+      addSelected([...selected, uuid]);
+    } else {
+      let copy = [...selected];
+      copy.splice(copy.indexOf(uuid), 1);
+      addSelected(copy);
+    }
+  };
+
+  const getClasses = () => {
+    if (isSelected) return selectedClasses;
+    return gradient;
+  };
+
   const sub_classes = `font-medium text-sm flex flex-row items-center`;
   return (
     <>
+      <modalContext.Provider value={{ changeProfiles, currentGroup, profiles }}>
+        <ProfileModal
+          shown={shown}
+          handleClose={() => changeVis(false)}
+          edit={true}
+          editedUuid={uuid}
+        />
+      </modalContext.Provider>
       <div
         className='flex flex-col mb-2 relative h-32 w-72 px-4 py-4 rounded-lg mr-2'
-        style={gradient}
+        style={getClasses()}
+        id={uuid}
+        onClick={selectProf}
       >
         <div className='font-semibold text-md flex flex-row justify-between w-full'>
           <div>{profName}</div>
           <div>
-            <button className=''>
+            <button className='' onClick={() => changeVis(true)}>
               <svg
                 width='20'
                 height='20'
@@ -72,7 +118,7 @@ const Profile = ({
                 </g>
               </svg>
             </button>
-            <button className='ml-5'>
+            <button className='ml-5' onClick={() => changeVis(true)}>
               <svg
                 width='20'
                 height='20'

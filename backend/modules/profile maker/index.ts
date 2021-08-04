@@ -14,6 +14,7 @@ import {
   deleteAll,
   getProfile,
   jigProfiles,
+  editProfile,
   editGroup,
 } from "./converter/converter_main";
 
@@ -34,4 +35,5 @@ export default {
   deleteGroup,
   editGroup,
   jigProfiles,
+  editProfile,
 };

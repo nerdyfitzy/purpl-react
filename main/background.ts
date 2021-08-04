@@ -208,3 +208,12 @@ ipcMain.on("test-sel-gmails", async (event, { selected, group, type }) => {
 
   event.reply("test-gmails-reply", 1);
 });
+
+ipcMain.on("get-profile", async (event, { group, uuid }) => {
+  console.log(`got ${group} ${uuid}`);
+  event.returnValue = await ProfileConverter.getProfile(uuid, group);
+});
+
+ipcMain.on("edit-profile", (event, { group, uuid, newProf }) => {
+  ProfileConverter.editProfile(group, uuid, newProf);
+});

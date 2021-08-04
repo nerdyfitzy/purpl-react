@@ -1,8 +1,15 @@
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import Input from "../styledInput";
 import Select from "react-select";
 import { Prof } from "../../public/types/profiles";
 import { stateContext } from "../../pages/profiles";
+import { modalContext } from "./profile";
 import { v4 } from "uuid";
 import { ipcRenderer } from "electron";
 import toast from "react-hot-toast";
@@ -212,7 +219,7 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
           options={states}
           styles={selectStyles}
           onChange={setSState}
-          value={sState}
+          inputValue={sState}
         />
       </div>
       <div className='flex flex-col mr-10'>
@@ -223,7 +230,7 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
           options={countries}
           styles={selectStyles}
           onChange={setSCountry}
-          value={sCountry}
+          inputValue={sCountry}
         />
       </div>
       <div className='flex flex-row items-center absolute bottom-11 right-28'>
@@ -310,7 +317,7 @@ const Billing = () => {
           options={states}
           styles={selectStyles}
           onChange={setBState}
-          value={bState}
+          inputValue={bState}
         />
       </div>
       <div className='flex flex-col mr-10'>
@@ -321,7 +328,7 @@ const Billing = () => {
           options={countries}
           styles={selectStyles}
           onChange={setBCountry}
-          value={bCountry}
+          inputValue={bCountry}
         />
       </div>
     </>
@@ -366,7 +373,7 @@ const Payment = () => {
         <Select
           options={months}
           styles={selectStyles}
-          value={expMonth}
+          inputValue={expMonth}
           onChange={setExpMonth}
         />
       </div>
@@ -378,7 +385,7 @@ const Payment = () => {
         <Select
           options={years}
           styles={selectStyles}
-          value={expYear}
+          inputValue={expYear}
           onChange={setExpYear}
         />
       </div>
@@ -414,9 +421,13 @@ const Payment = () => {
 const ProfileModal = ({
   shown,
   handleClose,
+  edit = false,
+  editedUuid,
 }: {
   shown: boolean;
   handleClose: any;
+  edit?: boolean;
+  editedUuid?: string;
 }) => {
   const [page, setPage] = useState("Shipping");
   const [same, setSame] = useState(false);
@@ -428,8 +439,6 @@ const ProfileModal = ({
   const [sCountry, setSCountry] = useState("");
   const [sPhone, setSPhone] = useState("");
   const [sZip, setSZip] = useState("");
-
-  const [sameBilling, setSameBilling] = useState(false);
 
   const [bName, setBName] = useState("");
   const [bAddy1, setBAddy1] = useState("");
@@ -447,7 +456,44 @@ const ProfileModal = ({
   const [cvv, setCvv] = useState("");
   const [email, setEmail] = useState("");
   const [profName, setProfName] = useState("");
-  const { changeProfiles, currentGroup, profiles } = useContext(stateContext);
+  const { changeProfiles, currentGroup, profiles } = useContext(
+    !edit ? stateContext : modalContext
+  );
+  useEffect(() => {
+    if (edit && shown) {
+      const prof: Prof = ipcRenderer.sendSync("get-profile", {
+        group: currentGroup,
+        uuid: editedUuid,
+      });
+      console.log(prof);
+      setSame(prof.sameBilling);
+      setSName(prof.shipping.name);
+      setSAddy1(prof.shipping.addy1);
+      setSAddy2(prof.shipping.addy2);
+      setSCity(prof.shipping.city);
+      setSState(prof.shipping.state);
+      setSCountry(prof.shipping.country);
+      setSPhone(prof.shipping.phone);
+      setSZip(prof.shipping.zip);
+
+      setBName(prof.billing.name);
+      setBAddy1(prof.billing.addy1);
+      setBAddy2(prof.billing.addy2);
+      setBCity(prof.billing.city);
+      setBState(prof.billing.state);
+      setBCountry(prof.billing.country);
+      setBPhone(prof.billing.phone);
+      setBZip(prof.billing.zip);
+
+      setCardName(prof.payment.name);
+      setCardNum(prof.payment.cnb);
+      setExpMonth(prof.payment.month);
+      setExpYear(prof.payment.year);
+      setCvv(prof.payment.cvv);
+      setEmail(prof.email);
+      setProfName(prof.profile_name);
+    }
+  }, [shown]);
   if (!shown) return null;
   function handleClick(e) {
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
@@ -459,7 +505,6 @@ const ProfileModal = ({
       !sName ||
       !sPhone ||
       !sAddy1 ||
-      !sAddy2 ||
       !sZip ||
       !sCity ||
       !sState ||
@@ -476,7 +521,7 @@ const ProfileModal = ({
     )
       return toast.error("Please fill all required fields!");
     let profile: Prof = {
-      uuid: "",
+      uuid: edit ? editedUuid : "",
       profile_name: profName,
       email: email,
       one_checkout: false,
@@ -533,21 +578,46 @@ const ProfileModal = ({
 
     console.log(profile);
 
-    const uuid = ipcRenderer.sendSync("add-profile", {
-      profile,
-      group: currentGroup,
-    });
-    changeProfiles([
-      ...profiles,
-      {
-        uuid,
-        name: profile.profile_name,
-        last4: profile.payment.cnb.substring(profile.payment.cnb.length - 4),
-        address: profile.shipping.addy1,
-        email: profile.email,
-        type: profile.payment.type,
-      },
-    ]);
+    if (!edit) {
+      const uuid = ipcRenderer.sendSync("add-profile", {
+        profile,
+        group: currentGroup,
+      });
+      changeProfiles([
+        ...profiles,
+        {
+          uuid,
+          name: profile.profile_name,
+          last4: profile.payment.cnb.substring(profile.payment.cnb.length - 4),
+          address: profile.shipping.addy1,
+          email: profile.email,
+          type: profile.payment.type,
+        },
+      ]);
+    } else {
+      ipcRenderer.send("edit-profile", {
+        group: currentGroup,
+        uuid: editedUuid,
+        newProf: profile,
+      });
+      let copy = [...profiles];
+      let [res] = copy.filter((obj) => obj.uuid === editedUuid);
+      const index = copy.indexOf(res);
+      if (index > -1) {
+        copy.splice(index, 1);
+        copy[index].name = profile.profile_name;
+        copy[index].last4 = profile.payment.cnb.substring(
+          profile.payment.cnb.length - 4
+        );
+        copy[index].address = profile.shipping.addy1;
+        copy[index].email = profile.email;
+        copy[index].type = profile.payment.type;
+        changeProfiles(copy);
+        toast.success("Edited Profile!");
+      }
+    }
+
+    handleClose();
   }
 
   function pageHandler() {
@@ -573,7 +643,7 @@ const ProfileModal = ({
                 setSCity,
                 setSState,
                 setSCountry,
-                setSameBilling,
+                setSame,
                 setSPhone,
                 setSZip,
               },
@@ -660,7 +730,7 @@ const ProfileModal = ({
   return (
     <>
       <div
-        className='w-full h-full flex justify-center items-center absolute z-30'
+        className='top-0 left-0 w-full h-full flex justify-center items-center absolute z-30'
         style={darken}
         onClick={handleClick}
         id='modalBackground'

@@ -273,25 +273,31 @@ function Home() {
                 </div>
               </div>
               <div className='flex flex-row flex-wrap scrollbars h-3/6'>
-                {searchTerm === ""
-                  ? profiles.map((profile) => (
-                      <Profile
-                        profName={profile.name}
-                        addy={profile.address}
-                        last4={profile.last4}
-                        email={profile.email}
-                        type={profile.type}
-                      />
-                    ))
-                  : filteredProfiles.map((profile) => (
-                      <Profile
-                        profName={profile.name}
-                        addy={profile.address}
-                        last4={profile.last4}
-                        email={profile.email}
-                        type={profile.type}
-                      />
-                    ))}
+                <stateContext.Provider value={changeStates}>
+                  {searchTerm === ""
+                    ? profiles.map((profile) => (
+                        <Profile
+                          profName={profile.name}
+                          addy={profile.address}
+                          last4={profile.last4}
+                          email={profile.email}
+                          type={profile.type}
+                          uuid={profile.uuid}
+                          isSelected={selected.includes(profile.uuid)}
+                        />
+                      ))
+                    : filteredProfiles.map((profile) => (
+                        <Profile
+                          profName={profile.name}
+                          addy={profile.address}
+                          last4={profile.last4}
+                          email={profile.email}
+                          type={profile.type}
+                          uuid={profile.uuid}
+                          isSelected={selected.includes(profile.uuid)}
+                        />
+                      ))}
+                </stateContext.Provider>
               </div>
             </div>
           </div>

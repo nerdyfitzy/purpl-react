@@ -35,6 +35,7 @@ const TaskGroup = ({
   const selectGroup = () => {
     setCurrentGroup(uuid);
     addSelected([]);
+    console.log("set " + uuid);
     const profiles = ipcRenderer.sendSync("load-profiles", {
       initial: false,
       group: uuid,
