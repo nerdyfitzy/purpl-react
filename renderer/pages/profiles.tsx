@@ -121,6 +121,10 @@ function Home() {
         type: prof.payment.type,
       }));
       changeProfiles([...profiles, ...newProfiles]);
+      let c = groups.filter((obj) => {
+        obj.total = obj.uuid === currentGroup ? profiles.length : obj.total;
+        return true;
+      });
     }
   };
   const exportProfiles = () => {};
@@ -215,12 +219,6 @@ function Home() {
                 style={{ color: "#6F6B75" }}
               >
                 LIST
-                <div
-                  className='font-semibold text-sm mt-8'
-                  style={{ color: "#6F6B75" }}
-                >
-                  Selected
-                </div>
               </div>
 
               <div className='flex flex-row justify-between w-full items-center'>
