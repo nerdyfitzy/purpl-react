@@ -217,3 +217,7 @@ ipcMain.on("get-profile", async (event, { group, uuid }) => {
 ipcMain.on("edit-profile", (event, { group, uuid, newProf }) => {
   ProfileConverter.editProfile(group, uuid, newProf);
 });
+
+ipcMain.on("delete-profile", (event, { group, uuid }) => {
+  ProfileConverter.deleteProfile(uuid, group);
+});

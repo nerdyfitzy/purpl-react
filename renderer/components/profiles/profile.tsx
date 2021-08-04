@@ -1,4 +1,6 @@
+import { ipcRenderer } from "electron";
 import React, { createContext, useContext, useState } from "react";
+import toast from "react-hot-toast";
 import { stateContext } from "../../pages/profiles";
 import ProfileModal from "./addProfile";
 
@@ -73,6 +75,26 @@ const Profile = ({
     }
   };
 
+  const deleteProfile = () => {
+    ipcRenderer.send("delete-profile", { group: currentGroup, uuid });
+    let copy = [...profiles];
+    const [res] = copy.filter((obj) => obj.uuid === uuid);
+    console.log(res);
+    const index = copy.indexOf(res);
+    if (index > -1) {
+      copy.splice(index, 1);
+      let groupsCopy = [...groups];
+      groupsCopy = groupsCopy.filter((obj) => {
+        obj.total = obj.uuid === currentGroup ? obj.total - 1 : obj.total;
+
+        return true;
+      });
+      changeGroups(groupsCopy);
+      changeProfiles(copy);
+    }
+    toast.success("Deleted Profile!");
+  };
+
   const getClasses = () => {
     if (isSelected) return selectedClasses;
     return gradient;
@@ -118,7 +140,7 @@ const Profile = ({
                 </g>
               </svg>
             </button>
-            <button className='ml-5' onClick={() => changeVis(true)}>
+            <button className='ml-5' onClick={deleteProfile}>
               <svg
                 width='20'
                 height='20'
