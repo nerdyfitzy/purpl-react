@@ -120,11 +120,14 @@ function Home() {
         last4: prof.payment.cnb.substring(prof.payment.cnb.length - 4),
         type: prof.payment.type,
       }));
-      changeProfiles([...profiles, ...newProfiles]);
       let c = groups.filter((obj) => {
-        obj.total = obj.uuid === currentGroup ? profiles.length : obj.total;
+        obj.total =
+          obj.uuid === currentGroup ? obj.total + selected.length : obj.total;
         return true;
       });
+      changeProfiles([...profiles, ...newProfiles]);
+
+      changeGroups(c);
     }
   };
   const exportProfiles = () => {};
