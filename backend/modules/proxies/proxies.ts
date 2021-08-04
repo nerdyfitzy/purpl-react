@@ -5,11 +5,6 @@ import * as console from "../../utils/logger";
 import { ipcMain } from "electron";
 import clipboardy from "clipboardy";
 //proxy example
-let proxyExample = {
-  uuid: "this is a specific uuid for each proxy",
-  proxy: "this is the actual proxy",
-  speed: "either undefined or the speed of last test",
-};
 
 var groups = {
   default: {

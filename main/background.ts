@@ -226,3 +226,10 @@ ipcMain.on("copy-profiles", async (event, { profiles, group }) => {
   const newprf = await ProfileConverter.copyProfiles(profiles, group);
   event.returnValue = newprf;
 });
+
+ipcMain.on(
+  "delete-selected-profiles",
+  (event, { profiles, group }: { profiles: Array<string>; group: string }) => {
+    ProfileConverter.deleteSelected(profiles, group);
+  }
+);

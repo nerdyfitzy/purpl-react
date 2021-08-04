@@ -14,6 +14,7 @@ import ImExC from "../components/importExportCopy";
 import GroupModal from "../components/harvester/groupModal";
 import AccountModal from "../components/harvester/addAccount";
 import { ipcRenderer } from "electron";
+import Filter from "../components/proxies/filters";
 
 //this is the harvester for now just to get the hang of it
 
@@ -40,6 +41,8 @@ function Home() {
   const [currentGroup, setCurrentGroup] = useState<string>("default");
   const [gmails, addGmails] = useState<Array<Gmail>>([]);
   const [selected, addSelected] = useState<Array<string>>([]);
+  const [currentFilter, setCurrentFilter] = useState("All Gmails");
+  const [filtered, setFiltered] = useState<Array<Gmail>>([]);
 
   useEffect(() => {
     const newGroups = ipcRenderer.sendSync("load-gmails", {
@@ -297,6 +300,32 @@ function Home() {
     }
   };
 
+  const filterGmails = (filterType) => {
+    const newProxies = gmails.filter((gmail) => {
+      switch (filterType) {
+        case "0.9":
+          if (gmail.score.v3 === 0.9) return true;
+          else return false;
+        case "0.7+":
+          if (gmail.score.v3 >= 0.7) return true;
+          else return false;
+        case "v2 Visible":
+          if (gmail.score.v2v) return true;
+          else return false;
+        case "v2 Invisible":
+          if (gmail.score.v2i) return true;
+          else return false;
+        case "Bad Health":
+          if (!gmail.score.v2i && !gmail.score.v2v && gmail.score.v3 < 0.7)
+            return true;
+          else return false;
+      }
+    });
+
+    setCurrentFilter(filterType);
+    setFiltered(newProxies);
+  };
+
   ipcRenderer.on("test-gmails-reply", (event, arg) => {
     getGmails(currentGroup);
   });
@@ -365,7 +394,52 @@ function Home() {
               </div>
             </div>
 
-            <div className='h-full ml-8 w-full'>
+            <div className='h-full ml-8 w-full relative'>
+              <div className='absolute right-0 top-0 flex flex-row m-4'>
+                <Filter
+                  filterName='All Gmails'
+                  num={gmails.length}
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "All Gmails"}
+                />
+                <Filter
+                  filterName='0.9'
+                  num={gmails.filter((gmail) => gmail.score.v3 === 0.9).length}
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "0.9"}
+                />
+                <Filter
+                  filterName='0.7+'
+                  num={gmails.filter((gmail) => gmail.score.v3 >= 0.7).length}
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "0.7+"}
+                />
+                <Filter
+                  filterName='v2 Visible'
+                  num={gmails.filter((gmail) => gmail.score.v2v).length}
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "v2 Visible"}
+                />
+                <Filter
+                  filterName='v2 Invisible'
+                  num={gmails.filter((gmail) => gmail.score.v2i).length}
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "v2 Invisible"}
+                />
+                <Filter
+                  filterName='Bad Health'
+                  num={
+                    gmails.filter(
+                      (gmail) =>
+                        !gmail.score.v2i &&
+                        !gmail.score.v2v &&
+                        gmail.score.v3 < 0.7
+                    ).length
+                  }
+                  handleFilter={(t) => filterGmails(t)}
+                  isSelected={currentFilter === "Bad Health"}
+                />
+              </div>
               <div
                 className='font-semibold text-sm mt-8'
                 style={{ color: "#6F6B75" }}
@@ -498,25 +572,45 @@ function Home() {
                   </div>
                 </div>
                 <div className='scrollbars h-4/6'>
-                  {gmails.map((gmail) => (
-                    <Task
-                      handleEdit={handleGmailEdit}
-                      handleDelete={handleGmailDelete}
-                      groupID={currentGroup}
-                      handleClick={selectTask}
-                      id={gmail.uuid}
-                      score={gmail.score}
-                      num={gmails.indexOf(gmail) + 1}
-                      email={gmail.email}
-                      proxy={gmail.proxy}
-                      status={gmail.status}
-                      running={gmail.running}
-                      handleStart={handleGmailAction}
-                      startSel={startSel}
-                      stopSel={stopSel}
-                      test={test}
-                    />
-                  ))}
+                  {filtered.length === 0
+                    ? gmails.map((gmail) => (
+                        <Task
+                          handleEdit={handleGmailEdit}
+                          handleDelete={handleGmailDelete}
+                          groupID={currentGroup}
+                          handleClick={selectTask}
+                          id={gmail.uuid}
+                          score={gmail.score}
+                          num={gmails.indexOf(gmail) + 1}
+                          email={gmail.email}
+                          proxy={gmail.proxy}
+                          status={gmail.status}
+                          running={gmail.running}
+                          handleStart={handleGmailAction}
+                          startSel={startSel}
+                          stopSel={stopSel}
+                          test={test}
+                        />
+                      ))
+                    : filtered.map((gmail) => (
+                        <Task
+                          handleEdit={handleGmailEdit}
+                          handleDelete={handleGmailDelete}
+                          groupID={currentGroup}
+                          handleClick={selectTask}
+                          id={gmail.uuid}
+                          score={gmail.score}
+                          num={gmails.indexOf(gmail) + 1}
+                          email={gmail.email}
+                          proxy={gmail.proxy}
+                          status={gmail.status}
+                          running={gmail.running}
+                          handleStart={handleGmailAction}
+                          startSel={startSel}
+                          stopSel={stopSel}
+                          test={test}
+                        />
+                      ))}
                 </div>
               </div>
               {/* <div

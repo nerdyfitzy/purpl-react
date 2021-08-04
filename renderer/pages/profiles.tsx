@@ -9,7 +9,7 @@ import {
   Group,
   FormattedProfile,
 } from "../public/types/profiles";
-
+import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
@@ -129,6 +129,14 @@ function Home() {
 
       changeGroups(c);
     }
+  };
+  const deleteSelected = () => {
+    ipcRenderer.send("delete-selected-profiles", {
+      profiles: selected,
+      group: currentGroup,
+    });
+    let c = profiles.filter((obj) => !selected.includes(obj.uuid));
+    changeProfiles(c);
   };
   const exportProfiles = () => {};
   const importProfiles = () => {};
@@ -298,33 +306,43 @@ function Home() {
                   />
                 </div>
               </div>
-              <div className='flex flex-row flex-wrap scrollbars h-3/6'>
-                <stateContext.Provider value={changeStates}>
-                  {searchTerm === ""
-                    ? profiles.map((profile) => (
-                        <Profile
-                          profName={profile.name}
-                          addy={profile.address}
-                          last4={profile.last4}
-                          email={profile.email}
-                          type={profile.type}
-                          uuid={profile.uuid}
-                          isSelected={selected.includes(profile.uuid)}
-                        />
-                      ))
-                    : filteredProfiles.map((profile) => (
-                        <Profile
-                          profName={profile.name}
-                          addy={profile.address}
-                          last4={profile.last4}
-                          email={profile.email}
-                          type={profile.type}
-                          uuid={profile.uuid}
-                          isSelected={selected.includes(profile.uuid)}
-                        />
-                      ))}
-                </stateContext.Provider>
-              </div>
+              <ContextMenuTrigger id='profile'>
+                <div className='flex flex-row flex-wrap scrollbars h-3/6'>
+                  <stateContext.Provider value={changeStates}>
+                    {searchTerm === ""
+                      ? profiles.map((profile) => (
+                          <Profile
+                            profName={profile.name}
+                            addy={profile.address}
+                            last4={profile.last4}
+                            email={profile.email}
+                            type={profile.type}
+                            uuid={profile.uuid}
+                            isSelected={selected.includes(profile.uuid)}
+                          />
+                        ))
+                      : filteredProfiles.map((profile) => (
+                          <Profile
+                            profName={profile.name}
+                            addy={profile.address}
+                            last4={profile.last4}
+                            email={profile.email}
+                            type={profile.type}
+                            uuid={profile.uuid}
+                            isSelected={selected.includes(profile.uuid)}
+                          />
+                        ))}
+                  </stateContext.Provider>
+                </div>
+              </ContextMenuTrigger>
+
+              <ContextMenu id='profile'>
+                <MenuItem onClick={copyGroup}>Copy Selected</MenuItem>
+                <MenuItem>Jig Selected</MenuItem>
+                <MenuItem>Move Selected</MenuItem>
+                <MenuItem onClick={deleteSelected}>Delete Selected</MenuItem>
+                <MenuItem>Export Selected</MenuItem>
+              </ContextMenu>
             </div>
           </div>
         </div>
