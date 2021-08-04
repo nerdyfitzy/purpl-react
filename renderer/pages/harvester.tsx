@@ -444,7 +444,11 @@ function Home() {
                 className='font-semibold text-sm mt-8'
                 style={{ color: "#6F6B75" }}
               >
-                HARVESTERS
+                HARVESTERS (
+                {currentFilter === "All Gmails"
+                  ? gmails.length
+                  : filtered.length}
+                )
               </div>
 
               <div className='flex flex-row justify-between w-full'>
@@ -572,7 +576,7 @@ function Home() {
                   </div>
                 </div>
                 <div className='scrollbars h-4/6'>
-                  {filtered.length === 0
+                  {filtered.length === 0 && currentFilter === "All Gmails"
                     ? gmails.map((gmail) => (
                         <Task
                           handleEdit={handleGmailEdit}

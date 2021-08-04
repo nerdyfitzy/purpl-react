@@ -229,7 +229,7 @@ function Home() {
                 className='font-semibold text-sm mt-8'
                 style={{ color: "#6F6B75" }}
               >
-                LIST
+                LIST ({selected.length} Selected)
               </div>
 
               <div className='flex flex-row justify-between w-full items-center'>

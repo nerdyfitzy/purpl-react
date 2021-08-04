@@ -229,7 +229,11 @@ function Home() {
                 className='font-semibold text-sm mt-8'
                 style={{ color: "#6F6B75" }}
               >
-                LIST
+                LIST (
+                {currentFilter === "All Proxies"
+                  ? proxies.length
+                  : filteredProxies.length}{" "}
+                Total, {selected.length} Selected)
               </div>
 
               <div className='flex flex-row justify-between w-full items-center'>
@@ -372,7 +376,8 @@ function Home() {
                   <stateContext.Provider
                     value={{ addSelected, changeProxies, proxies, selected }}
                   >
-                    {filteredProxies.length === 0
+                    {filteredProxies.length === 0 &&
+                    currentFilter === "All Proxies"
                       ? proxies.map((proxy) => {
                           const [ip, port, user, pass] = proxy.proxy.split(":");
                           return (
