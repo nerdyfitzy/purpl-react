@@ -66,6 +66,10 @@ const Proxy = ({
     });
     changeGroups(g);
     changeProxies(c);
+    if (selected.includes(uuid)) {
+      const index = selected.indexOf(uuid);
+      selected.splice(index, 1);
+    }
   };
   return (
     <>

@@ -103,6 +103,14 @@ body {
 .react-contextmenu-item--selected {
   background: #b584ff;
 }
+.react-contextmenu-wrapper {
+  /* flex flex-row flex-wrap scrollbars h-3/6 */
+  display: flex;
+  flex-direction: row;
+  overflow-y: auto;
+  flex-wrap: wrap;
+  height: 50%;
+}
 
 .react-contextmenu-item {
   color: #ffffff;
