@@ -1,19 +1,32 @@
 import React from "react";
 
+const norm = { color: "#6F6B75" };
+
+const sel = { color: "#9456F1" };
+
 const Filter = ({
   filterName,
   num,
   handleFilter,
+  isSelected,
 }: {
   filterName: string;
   num: number;
   handleFilter: any;
+  isSelected: boolean;
 }) => {
+  const clicked = () => {
+    handleFilter(filterName);
+  };
+  const giveSel = () => {
+    if (isSelected) return sel;
+    return norm;
+  };
   return (
     <button
       className='flex flex-row items-center text-sm font-medium mr-6'
-      style={{ color: "#6F6B75" }}
-      onClick={() => handleFilter(filterName)}
+      style={giveSel()}
+      onClick={clicked}
     >
       {filterName}
       <div

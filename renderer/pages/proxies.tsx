@@ -46,11 +46,18 @@ function Home() {
   const [currentGroup, setCurrentGroup] = useState<string>("default");
   const [proxies, changeProxies] = useState<Array<ProxyType>>([]);
   const [filteredProxies, setFilteredProxies] = useState<Array<ProxyType>>([]);
+  const [currentFilter, setCurrentFilter] = useState("All Proxies");
   const [selected, addSelected] = useState<Array<string>>([]);
 
   const changeStates = [
-    { changeGroups, setCurrentGroup, changeProxies, addSelected },
-    { groups, currentGroup, proxies, selected },
+    {
+      changeGroups,
+      setCurrentGroup,
+      changeProxies,
+      addSelected,
+      setFilteredProxies,
+    },
+    { groups, currentGroup, proxies, selected, filteredProxies },
   ];
 
   useEffect(() => {
@@ -122,7 +129,7 @@ function Home() {
           else return false;
       }
     });
-    console.log(newProxies, filterType);
+    setCurrentFilter(filterType);
     setFilteredProxies(newProxies);
   };
   return (
@@ -183,11 +190,13 @@ function Home() {
                   filterName='All Proxies'
                   num={proxies.length}
                   handleFilter={(t) => filterProxies(t)}
+                  isSelected={currentFilter === "All Proxies"}
                 />
                 <Filter
                   filterName='<500ms'
                   num={proxies.filter((prox) => prox.speed < 500).length}
                   handleFilter={(t) => filterProxies(t)}
+                  isSelected={currentFilter === "<500ms"}
                 />
                 <Filter
                   filterName='500-1000ms'
@@ -197,6 +206,7 @@ function Home() {
                     ).length
                   }
                   handleFilter={(t) => filterProxies(t)}
+                  isSelected={currentFilter === "500-1000ms"}
                 />
                 <Filter
                   filterName='1000-2000ms'
@@ -206,11 +216,13 @@ function Home() {
                     ).length
                   }
                   handleFilter={(t) => filterProxies(t)}
+                  isSelected={currentFilter === "1000-2000ms"}
                 />
                 <Filter
                   filterName='2000ms+'
                   num={proxies.filter((prox) => prox.speed > 2000).length}
                   handleFilter={(t) => filterProxies(t)}
+                  isSelected={currentFilter === "2000ms+"}
                 />
               </div>
               <div

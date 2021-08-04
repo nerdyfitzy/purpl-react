@@ -31,7 +31,13 @@ const TaskGroup = ({
   console.log(name, uuid, total, isSelected);
   const [shown, changeVis] = useState(false);
   const [
-    { changeGroups, setCurrentGroup, changeProxies, addSelected },
+    {
+      changeGroups,
+      setCurrentGroup,
+      changeProxies,
+      addSelected,
+      setFilteredProxies,
+    },
     { groups, currentGroup, proxies, selected },
   ] = useContext(stateContext);
   const selectGroup = () => {
@@ -49,6 +55,7 @@ const TaskGroup = ({
     const newProxies = Object.values(proxies);
 
     changeProxies(newProxies);
+    setFilteredProxies([]);
   };
   const getSelectedClasses = () => {
     if (isSelected) return selectedClasses;
