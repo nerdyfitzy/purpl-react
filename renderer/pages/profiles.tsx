@@ -247,7 +247,11 @@ function Home() {
                   className='font-semibold text-sm mt-8'
                   style={{ color: "#6F6B75" }}
                 >
-                  LIST ({selected.length} Selected)
+                  LIST (
+                  {filteredProfiles.length === 0
+                    ? profiles.length
+                    : filteredProfiles.length}{" "}
+                  Total, {selected.length} Selected)
                 </div>
 
                 <div className='flex flex-row justify-between w-full items-center'>
@@ -324,7 +328,7 @@ function Home() {
                     />
                   </div>
                 </div>
-                <ContextMenuTrigger id='profile'>
+                <div className='flex flex-row scrollbars flex-wrap h-3/6'>
                   <stateContext.Provider value={changeStates}>
                     {searchTerm === ""
                       ? profiles.map((profile) => (
@@ -350,7 +354,7 @@ function Home() {
                           />
                         ))}
                   </stateContext.Provider>
-                </ContextMenuTrigger>
+                </div>
 
                 <ContextMenu id='profile'>
                   <MenuItem onClick={copyGroup}>Copy Selected</MenuItem>
