@@ -12,6 +12,7 @@ body {
   background: #17131d;
   font-family: articulat-cf;
   overflow: hidden;
+  user-select: none;
 }
 
 @font-face {

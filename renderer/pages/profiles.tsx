@@ -21,7 +21,7 @@ import ImExC from "../components/importExportCopy";
 import Profile from "../components/profiles/profile";
 import GroupModal from "../components/profiles/profGroupModal";
 import ProfileModal from "../components/profiles/addProfile";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, remote } from "electron";
 import toast from "react-hot-toast";
 
 //this is the harvester for now just to get the hang of it
@@ -56,6 +56,9 @@ function Home() {
     Array<FormattedProfile>
   >([]);
 
+  const shift = useRef(false);
+  const ctrl = useRef(false);
+
   const searchInput = useRef(null);
 
   const selectAll = () => {
@@ -73,6 +76,13 @@ function Home() {
   };
 
   useEffect(() => {
+    const win = remote.getCurrentWindow();
+    win.webContents.on("before-input-event", (event, input) => {
+      console.log(input.control, input.shift);
+      ctrl.current = input.control;
+      shift.current = input.shift;
+    });
+
     const groups = ipcRenderer.sendSync("load-profiles", {
       initial: true,
       group: undefined,
@@ -114,6 +124,8 @@ function Home() {
       currentGroup,
       profiles,
       selected,
+      shift,
+      ctrl,
     },
   ];
 

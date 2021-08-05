@@ -42,7 +42,7 @@ const Profile = ({
   const [shown, changeVis] = useState(false);
   const [
     { changeGroups, setCurrentGroup, changeProfiles, addSelected },
-    { groups, currentGroup, profiles, selected },
+    { groups, currentGroup, profiles, selected, shift, ctrl },
   ] = useContext(stateContext);
   function Dot() {
     return (
@@ -67,6 +67,7 @@ const Profile = ({
   }
 
   const selectProf = () => {
+    console.log("THIS MATTERS", ctrl.current, shift.current);
     if (!selected.includes(uuid)) {
       addSelected([...selected, uuid]);
     } else {
