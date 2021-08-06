@@ -69,11 +69,35 @@ const Profile = ({
   const selectProf = () => {
     console.log("THIS MATTERS", ctrl.current, shift.current);
     if (!selected.includes(uuid)) {
-      addSelected([...selected, uuid]);
+      if (!ctrl.current && !shift.current) {
+        addSelected([uuid]);
+      } else if (ctrl.current) {
+        addSelected([...selected, uuid]);
+      } else if (shift.current) {
+        if (selected.length === 0) {
+          addSelected([uuid]);
+        } else {
+          const LAST_SELECTED = selected[selected.length - 1];
+          const STARTING_INDEX = profiles.indexOf(
+            profiles.filter((obj) => obj.uuid === LAST_SELECTED)[0]
+          );
+          const ENDING_INDEX = profiles.indexOf(
+            profiles.filter((obj) => obj.uuid === uuid)[0]
+          );
+          let newUuids = [];
+          for (let i = STARTING_INDEX; i <= ENDING_INDEX; i++) {
+            newUuids.push(profiles[i].uuid);
+          }
+
+          addSelected([...selected, ...newUuids]);
+        }
+      }
     } else {
-      let copy = [...selected];
-      copy.splice(copy.indexOf(uuid), 1);
-      addSelected(copy);
+      if (ctrl.current) {
+        let copy = [...selected];
+        copy.splice(copy.indexOf(uuid), 1);
+        addSelected(copy);
+      }
     }
   };
 
