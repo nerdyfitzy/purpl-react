@@ -40,17 +40,42 @@ const Proxy = ({
     currentGroup,
     groups,
     changeGroups,
+    ctrl,
+    shift,
   } = useContext(stateContext);
   const classes = `text-sm font-medium w-20 mr-16 overflow-hidden `;
   const selectProxy = () => {
     if (!selected.includes(uuid)) {
-      addSelected([...selected, uuid]);
+      if (!ctrl.current && !shift.current) {
+        addSelected([uuid]);
+      } else if (ctrl.current) {
+        addSelected([...selected, uuid]);
+      } else if (shift.current) {
+        if (selected.length === 0) {
+          addSelected([uuid]);
+        } else {
+          const LAST_SELECTED = selected[selected.length - 1];
+          const STARTING_INDEX = proxies.indexOf(
+            proxies.filter((obj) => obj.uuid === LAST_SELECTED)[0]
+          );
+          const ENDING_INDEX = proxies.indexOf(
+            proxies.filter((obj) => obj.uuid === uuid)[0]
+          );
+          let newUuids = [];
+          for (let i = STARTING_INDEX + 1; i <= ENDING_INDEX; i++) {
+            newUuids.push(proxies[i].uuid);
+          }
+
+          addSelected([...selected, ...newUuids]);
+        }
+      }
     } else {
-      let copy = [...selected];
-      copy.splice(copy.indexOf(uuid), 1);
-      addSelected(copy);
+      if (ctrl.current) {
+        let copy = [...selected];
+        copy.splice(copy.indexOf(uuid), 1);
+        addSelected(copy);
+      }
     }
-    console.log(selected);
   };
   const getSelectedClasses = () => {
     if (isSelected) return selectedClasses;

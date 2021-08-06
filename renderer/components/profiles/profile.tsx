@@ -67,7 +67,6 @@ const Profile = ({
   }
 
   const selectProf = () => {
-    console.log("THIS MATTERS", ctrl.current, shift.current);
     if (!selected.includes(uuid)) {
       if (!ctrl.current && !shift.current) {
         addSelected([uuid]);
@@ -85,7 +84,7 @@ const Profile = ({
             profiles.filter((obj) => obj.uuid === uuid)[0]
           );
           let newUuids = [];
-          for (let i = STARTING_INDEX; i <= ENDING_INDEX; i++) {
+          for (let i = STARTING_INDEX + 1; i <= ENDING_INDEX; i++) {
             newUuids.push(profiles[i].uuid);
           }
 

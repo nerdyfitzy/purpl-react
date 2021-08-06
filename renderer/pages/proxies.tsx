@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, createContext, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -16,7 +16,7 @@ import Profile from "../components/profiles/profile";
 import GroupModal from "../components/proxies/addProxyGroup";
 import ProxyModal from "../components/proxies/addProxies";
 import { Group, ProxyType, FormattedGroup } from "../public/types/proxies";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, remote } from "electron";
 import Filter from "../components/proxies/filters";
 
 //this is the harvester for now just to get the hang of it
@@ -49,6 +49,9 @@ function Home() {
   const [currentFilter, setCurrentFilter] = useState("All Proxies");
   const [selected, addSelected] = useState<Array<string>>([]);
 
+  const shift = useRef(false);
+  const ctrl = useRef(false);
+
   const changeStates = [
     {
       changeGroups,
@@ -57,10 +60,16 @@ function Home() {
       addSelected,
       setFilteredProxies,
     },
-    { groups, currentGroup, proxies, selected, filteredProxies },
+    { groups, currentGroup, proxies, selected, filteredProxies, shift, ctrl },
   ];
 
   useEffect(() => {
+    const win = remote.getCurrentWindow();
+    win.webContents.on("before-input-event", (event, input) => {
+      console.log(input.control, input.shift);
+      ctrl.current = input.control;
+      shift.current = input.shift;
+    });
     const proxies = ipcRenderer.sendSync("load-proxies", {
       initial: true,
       group: undefined,
@@ -398,6 +407,8 @@ function Home() {
                         currentGroup,
                         groups,
                         changeGroups,
+                        ctrl,
+                        shift,
                       }}
                     >
                       {filteredProxies.length === 0 &&
