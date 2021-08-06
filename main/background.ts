@@ -5,6 +5,7 @@ import GmailFarmer from "../backend/modules/gmailfarming/index";
 import engine from "../backend/index";
 import ProfileConverter from "../backend/modules/profile maker/index";
 import Proxies from "../backend/modules/proxies/index";
+import Tester from "../backend/modules/proxies/tester/test_main";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -236,4 +237,20 @@ ipcMain.on(
 
 ipcMain.on("delete-proxy", (event, { group, uuid }) => {
   Proxies.deleteProxy(uuid, group);
+});
+
+const filter = (obj, predicate) => {
+  return Object.keys(obj)
+    .filter((key) => predicate(obj[key]))
+    .reduce((res, key) => ((res[key] = obj[key]), res), {});
+};
+
+ipcMain.on("test-proxies", async (event, { selected, group, site }) => {
+  let proxies = await Proxies.loadProxies(false, group);
+  if (selected.length > 0) {
+    proxies = filter(proxies, (proxy) => selected.includes(proxy.uuid));
+  }
+
+  const T = new Tester(proxies, site, group);
+  T.run();
 });

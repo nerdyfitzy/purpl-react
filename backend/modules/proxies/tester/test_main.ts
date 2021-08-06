@@ -2,9 +2,7 @@ const fs = require("fs");
 const got = require("got");
 const console = require("../../../utils/logger");
 const { HttpsProxyAgent } = require("hpagent");
-const { ipcMain } = require("electron");
 const { setSpeed } = require("../proxies");
-const { sendSpeedsToFrontend } = require("../../../../index");
 
 let chunks = [];
 let completed = 0;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Scrollbars } from "react-custom-scrollbars";
+import { toast } from "react-hot-toast";
 import { HotKeys } from "react-hotkeys";
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
@@ -70,11 +71,11 @@ function Home() {
       ctrl.current = input.control;
       shift.current = input.shift;
     });
-    const proxies = ipcRenderer.sendSync("load-proxies", {
+    const loadedProxies = ipcRenderer.sendSync("load-proxies", {
       initial: true,
       group: undefined,
     });
-    const formattedGroups = Object.values(proxies).map((group: Group) => {
+    const formattedGroups = Object.values(loadedProxies).map((group: Group) => {
       const total = Object.values(group.proxies).length;
       console.log(group);
       return {
@@ -84,15 +85,15 @@ function Home() {
       };
     });
     changeGroups(formattedGroups);
-    if (Object.values(proxies["default"].proxies).length > 0) {
-      const proxies: { [k: string]: ProxyType } = ipcRenderer.sendSync(
+    if (Object.values(loadedProxies["default"].proxies).length > 0) {
+      const defaultProxies: { [k: string]: ProxyType } = ipcRenderer.sendSync(
         "load-proxies",
         {
           initial: false,
           group: "default",
         }
       );
-      const formattedProxies = Object.values(proxies);
+      const formattedProxies = Object.values(defaultProxies);
 
       changeProxies(formattedProxies);
     }
@@ -130,6 +131,40 @@ function Home() {
       changeGroups(copy);
     }
     changeProxies([]);
+  };
+
+  const testAllProxies = () => {
+    ipcRenderer.send("test-proxies", {
+      site: "https://kith.com/",
+      group: currentGroup,
+      selected: [],
+    });
+
+    ipcRenderer.on(
+      "got-speeds",
+      (event, speeds: Array<{ proxy: string; speed: number }>) => {
+        for (const speed of speeds) {
+          const index = proxies.indexOf(
+            proxies.filter((obj) => obj.uuid === speed.proxy)[0]
+          );
+          let c = [...proxies];
+          c[index].speed = speed.speed;
+          changeProxies(c);
+        }
+      }
+    );
+
+    let cycle = 0;
+    const inter = setInterval(() => {
+      if (cycle >= 15) {
+        clearInterval(inter);
+        ipcRenderer.off("got-speeds", () => {});
+      }
+      cycle++;
+      ipcRenderer.send("request-speeds");
+    }, 2000);
+
+    toast.success("Testing Proxies!");
   };
 
   const filterProxies = (filterType: string) => {
@@ -296,6 +331,7 @@ function Home() {
                     <button
                       className='h-10 w-44 flex flex-row items-center rounded-md justify-evenly mr-4 font-medium text-sm'
                       style={{ background: "#B584FF" }}
+                      onClick={testAllProxies}
                     >
                       <svg
                         width='20'
