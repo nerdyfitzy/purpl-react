@@ -13,8 +13,12 @@ const ImExC = ({
   handleCopy: any;
 }) => {
   const fileImport = () => {
-    const data = ipcRenderer.send("import-file", page);
-    handleImport(data);
+    if (page === "harvester") {
+      const data = ipcRenderer.sendSync("import-file", page);
+      handleImport(data);
+      return;
+    }
+    handleImport();
   };
   const fileExport = () => {
     handleExport();

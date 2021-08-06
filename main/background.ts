@@ -135,7 +135,7 @@ ipcMain.on("import-file", async (event, arg) => {
           rt = await GmailFarmer.importFromFile(filePaths[0]);
           break;
         default:
-          event.returnValue = undefined;
+          event.returnValue = filePaths[0];
           return;
       }
       console.log(rt);
@@ -258,5 +258,11 @@ ipcMain.on("test-proxies", async (event, { selected, group, site }) => {
 ipcMain.on("export-profiles", (event, { profs, group, bots }) => {
   bots.forEach((robot) => {
     ProfileConverter.exportProfiles(profs, group, robot);
+  });
+});
+
+ipcMain.on("import-profiles", (event, { path, bot }) => {
+  ProfileConverter.importProfiles(path, bot, (returnval) => {
+    event.returnValue = returnval;
   });
 });
