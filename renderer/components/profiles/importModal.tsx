@@ -150,7 +150,7 @@ const ImportModal = ({
               className='absolute top-8 left-12 text-md font-semibold p-2 min-w-min max-w-none'
               style={botBorder}
             >
-              Export {selected.length === 0 ? profiles.length : selected.length}{" "}
+              Import {selected.length === 0 ? profiles.length : selected.length}{" "}
               Profiles
             </div>
           </div>

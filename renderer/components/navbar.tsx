@@ -18,12 +18,18 @@ const gradient = {
 
 const Navbar = ({ page }: { page: string }) => {
   function isSelected(el) {
-    if (el === page)
+    if (el === page && page !== "settings") {
       return {
         color: "#6F6B75",
         background:
           "linear-gradient(269.94deg, #211D27 1.36%, rgba(33, 29, 39, 0) 106.51%)",
       };
+    } else if (el === page && page === "settings") {
+      return {
+        color: "#FFFFFF",
+      };
+    }
+
     return { color: "#6F6B75" };
   }
   return (
@@ -432,10 +438,7 @@ const Navbar = ({ page }: { page: string }) => {
             className='absolute bottom-28 h-24 -left-1 w-full py-4'
           >
             <Link href='/settings'>
-              <a
-                className='h-8 flex flex-row items-center px-4 relative left-8 top-1'
-                style={isSelected("settings")}
-              >
+              <a className='h-8 flex flex-row items-center px-4 relative left-8 top-1'>
                 <svg
                   width='25'
                   height='25'
@@ -452,7 +455,10 @@ const Navbar = ({ page }: { page: string }) => {
                     fill='#9456F1'
                   />
                 </svg>
-                <div className='float-right ml-4 font-medium text-sm'>
+                <div
+                  className='float-right ml-4 font-medium text-sm'
+                  style={isSelected("settings")}
+                >
                   Settings
                 </div>
               </a>

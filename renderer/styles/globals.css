@@ -37,6 +37,11 @@ body {
   flex: 2 0 0;
 } */
 
+.input::placeholder {
+  color: "#FFFFFF";
+  font-size: small;
+}
+
 .scrollbars {
   overflow-y: auto;
 }
