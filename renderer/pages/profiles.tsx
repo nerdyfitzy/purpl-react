@@ -23,6 +23,7 @@ import GroupModal from "../components/profiles/profGroupModal";
 import ProfileModal from "../components/profiles/addProfile";
 import { ipcRenderer, remote } from "electron";
 import toast from "react-hot-toast";
+import ExportModal from "../components/profiles/exportModal";
 
 //this is the harvester for now just to get the hang of it
 
@@ -46,6 +47,7 @@ export const stateContext = createContext(null);
 function Home() {
   const [shown, changeVis] = useState(false);
   const [showProfModal, changeProfModal] = useState(false);
+  const [showExportModal, changeExportModal] = useState(false);
 
   const [groups, changeGroups] = useState<Array<Group>>([]);
   const [currentGroup, setCurrentGroup] = useState<string>("default");
@@ -203,9 +205,14 @@ function Home() {
           handleClose={() => changeVis(false)}
           handleSubmit={addGroup}
         />
+
         <stateContext.Provider
-          value={{ changeProfiles, currentGroup, profiles }}
+          value={{ changeProfiles, currentGroup, profiles, selected }}
         >
+          <ExportModal
+            shown={showExportModal}
+            handleClose={() => changeExportModal(false)}
+          />
           <ProfileModal
             shown={showProfModal}
             handleClose={() => changeProfModal(false)}
@@ -335,7 +342,7 @@ function Home() {
                     <ImExC
                       page='profiles'
                       handleCopy={copyGroup}
-                      handleExport={exportProfiles}
+                      handleExport={() => changeExportModal(true)}
                       handleImport={importProfiles}
                     />
                   </div>

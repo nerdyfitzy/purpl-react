@@ -254,3 +254,9 @@ ipcMain.on("test-proxies", async (event, { selected, group, site }) => {
   const T = new Tester(proxies, site, group);
   T.run();
 });
+
+ipcMain.on("export-profiles", (event, { profs, group, bots }) => {
+  bots.forEach((robot) => {
+    ProfileConverter.exportProfiles(profs, group, robot);
+  });
+});
