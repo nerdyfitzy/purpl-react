@@ -9,17 +9,18 @@ const border = {
 const CreateGroup = ({
   text,
   handleClick,
+  className,
 }: {
   text: string;
   handleClick: any;
+  className?: string;
 }) => {
+  const classes = className
+    ? className
+    : `rounded-lg h-14 w-40 my-6 flex flex-row justify-evenly items-center`;
   return (
     <>
-      <button
-        className='rounded-lg h-14 w-40 my-6 flex flex-row justify-evenly items-center'
-        style={border}
-        onClick={handleClick}
-      >
+      <button className={classes} style={border} onClick={handleClick}>
         <svg
           className='float-left pointer-events-none'
           width='20'

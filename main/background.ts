@@ -19,6 +19,8 @@ if (isProd) {
   await app.whenReady();
   app.on("quit", () => {
     GmailFarmer.saveGmails(true);
+    ProfileConverter.saveProfiles();
+    Proxies.saveProxies();
   });
   const code = await engine.setup();
   const mainWindow = createWindow("main", {

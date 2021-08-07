@@ -21,9 +21,9 @@ const borderBottom = {
   borderBottomWidth: "2px",
 };
 
-const borderRight = {
+const borderLeft = {
   borderColor: "#37324080",
-  borderRightWidth: "2px",
+  borderLeftWidth: "2px",
 };
 
 const gradient = {
@@ -39,14 +39,27 @@ function Home() {
         <Navbar page='dashboard' />
 
         <div className='flex flex-col w-full h-full justify-start'>
-          <div
-            className='w-full h-1/4 flex flex-col flex-1 items-start justify-between py-8 pl-8'
-            style={borderBottom}
-          >
+          <div className='w-9/12 h-1/4 flex flex-col flex-1 items-start justify-between py-8 pl-8'>
             <TopMenu />
             <div className='h-8'></div>
-            <div className='font-semibold text-4xl'>Dashboard</div>
+            <div className='font-semibold text-4xl'>
+              Dashboard{" "}
+              <div
+                className='text-xs font-small mt-1'
+                style={{ color: "#6F6B75" }}
+              >
+                Welcome to purpl.
+              </div>
+            </div>
           </div>
+          <div
+            className='absolute top-0 right-0 h-full w-1/5'
+            style={{
+              ...borderLeft,
+              background:
+                "linear-gradient(180deg, rgba(48, 43, 54, 0.0621) 0%, rgba(48, 43, 54, 0.23) 100%)",
+            }}
+          ></div>
         </div>
       </div>
       <BottomBar />
