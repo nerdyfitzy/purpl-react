@@ -143,9 +143,19 @@ body {
   );
 }
 
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  grid-template-rows: repeat(7, 30px);
+  grid-auto-flow: row;
+}
+
 .div1 {
   grid-row-start: 1;
   grid-row-end: 3;
+}
+.div1 > * {
+  color: #6f6b75;
 }
 .div2 {
   grid-row-start: 1;

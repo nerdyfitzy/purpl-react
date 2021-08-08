@@ -11,10 +11,13 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@types/d3-shape": "^3.0.2",
     "@types/react-select": "^4.0.17",
+    "@types/react-vis": "^1.11.7",
     "@types/uuid": "^8.3.1",
     "clipboardy": "^2.3.0",
     "csv-parser": "^3.0.0",
+    "d3-shape": "^3.0.1",
     "discord-rpc": "^3.2.0",
     "dotenv": "^10.0.0",
     "electron-serve": "^1.1.0",
@@ -35,6 +38,7 @@
     "react-hot-toast": "^2.0.0",
     "react-hotkeys": "^2.0.0",
     "react-select": "^4.3.1",
+    "react-vis": "^1.11.7",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2",
     "tough-cookie": "^4.0.0",

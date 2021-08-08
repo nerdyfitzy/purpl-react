@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { HotKeys } from "react-hotkeys";
 
 import "../styles/globals.css";
+import "react-vis/dist/style.css";
 
 const keyMap = {
   SELECT_ALL: "ctrl+a",

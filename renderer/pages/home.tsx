@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { Scrollbars } from "react-custom-scrollbars";
-
+import {
+  XYPlot,
+  VerticalBarSeries,
+  LineSeries,
+  HorizontalGridLines,
+  VerticalGridLines,
+  XAxis,
+  YAxis,
+  Crosshair,
+} from "react-vis";
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
@@ -15,6 +23,10 @@ import ImExC from "../components/importExportCopy";
 import GroupModal from "../components/harvester/groupModal";
 import Purchases from "../components/dashboard/purchaseCounter";
 import Spent from "../components/dashboard/spent";
+import CheckoutGraph from "../components/dashboard/checkoutGraph";
+import ProfitGraph from "../components/dashboard/profitGraph";
+import Calendar from "../components/dashboard/calendar";
+import Checkout from "../components/dashboard/checkout";
 
 //this is the harvester for now just to get the hang of it
 
@@ -51,6 +63,7 @@ function Home() {
       </svg>
     );
   };
+
   return (
     <React.Fragment>
       <Actions />
@@ -72,22 +85,44 @@ function Home() {
             </div>
           </div>
           <div className='parent'>
-            <div className='div1 rounded-lg'>hi </div>
-
+            <CheckoutGraph />
             <Spent />
             <Purchases />
-
-            <div className='div4 rounded-lg'>biii </div>
-            <div className='div5 rounded-lg'> blam</div>
+            <ProfitGraph />
+            <Calendar />
           </div>
           <div
-            className='absolute top-0 right-0 h-full w-1/5'
+            className='absolute top-0 right-0 h-full w-1/5 flex justify-center'
             style={{
               ...borderLeft,
               background:
                 "linear-gradient(180deg, rgba(48, 43, 54, 0.0621) 0%, rgba(48, 43, 54, 0.23) 100%)",
             }}
-          ></div>
+          >
+            <div className='relative top-40'>
+              <div className='text-2xl font-semibold text-center mb-4'>
+                Latest Checkouts
+              </div>
+              <div className='flex flex-col relative scrollbars h-4/6'>
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+                <Checkout />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <BottomBar />

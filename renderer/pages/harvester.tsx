@@ -65,6 +65,10 @@ function Home() {
     addGroups(g);
     if (newGroups["default"].gmails !== {}) getGmails("default");
     console.log(groups);
+
+    ipcRenderer.on("test-gmails-reply", (event, arg) => {
+      getGmails(currentGroup);
+    });
   }, []);
 
   const selectAll = () => {
@@ -340,10 +344,6 @@ function Home() {
     setCurrentFilter(filterType);
     setFiltered(newProxies);
   };
-
-  ipcRenderer.on("test-gmails-reply", (event, arg) => {
-    getGmails(currentGroup);
-  });
 
   const isBlurred = () => {
     if (showGroup || showAccount) return { filter: "blur(3px)" };
