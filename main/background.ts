@@ -6,6 +6,8 @@ import engine from "../backend/index";
 import ProfileConverter from "../backend/modules/profile maker/index";
 import Proxies from "../backend/modules/proxies/index";
 import Tester from "../backend/modules/proxies/tester/test_main";
+import { getSettings, saveSettings } from "../backend/utils/config/editConfig";
+import Webhook from "../backend/utils/webhook";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -267,4 +269,37 @@ ipcMain.on("import-profiles", (event, { path, bot }) => {
   ProfileConverter.importProfiles(path, bot, (returnval) => {
     event.returnValue = returnval;
   });
+});
+
+ipcMain.on(
+  "save-settings",
+  (event, { webhook, chrome, gmailToken, fiveSim, twoCap }) => {
+    saveSettings(webhook, chrome, gmailToken, twoCap, fiveSim);
+  }
+);
+
+ipcMain.on("test-webhook", async (event, hook) => {
+  const webhook = new Webhook();
+  const code = await webhook.send({
+    content: null,
+    embeds: [
+      {
+        title: ":wave: Test Successful",
+        description: "Thanks for choosing purpl!",
+        color: 6047141,
+        footer: {
+          text: "Purpl Automation",
+          icon_url:
+            "https://images-ext-2.discordapp.net/external/h8nYrnr7D0s5xXjO7uYWdM0aPxf0IW1PWeC_AEOh98o/%3Fwidth%3D300%26height%3D300/https/media.discordapp.net/attachments/733468013319159848/791784842034806804/Purpl_Logo_Transparent-01.png",
+        },
+      },
+    ],
+  });
+
+  event.returnValue = code;
+});
+
+ipcMain.on("get-settings", (event, arg) => {
+  const s = getSettings();
+  event.returnValue = s;
 });

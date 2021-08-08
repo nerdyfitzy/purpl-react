@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import Actions from "../components/actions";
 import TopMenu from "../components/topMenu";
 import Navbar from "../components/navbar";
 import User from "../components/settings/user";
+import { ipcRenderer } from "electron";
+import toast from "react-hot-toast";
+import { Settings } from "../public/types/settings";
 
 const borderBottom = {
   borderColor: "#37324080",
@@ -25,6 +28,40 @@ const gradient = {
 };
 
 const Home = () => {
+  const webhook = useRef(null);
+  const twoCap = useRef(null);
+  const fiveSim = useRef(null);
+  const chrome = useRef(null);
+  const gmail = useRef(null);
+
+  useEffect(() => {
+    const { global, misc }: Settings = ipcRenderer.sendSync("get-settings");
+    webhook.current.value = global.webhook;
+    twoCap.current.value = misc.twoCaptcha;
+    fiveSim.current.value = misc.fivesim;
+    chrome.current.value = global.chromePath;
+    gmail.current.value = misc.gmailToken;
+    return () => {};
+  }, []);
+
+  const saveSettings = () => {
+    ipcRenderer.send("save-settings", {
+      webhook: webhook.current.value,
+      chrome: chrome.current.value,
+      gmailToken: gmail.current.value,
+      fiveSim: fiveSim.current.value,
+      twoCap: twoCap.current.value,
+    });
+
+    toast.success("Saved Settings!");
+  };
+
+  const testWebhook = () => {
+    const code = ipcRenderer.sendSync("test-webhook", webhook.current.value);
+    if (typeof code === "undefined") toast.error("No Webhook Set");
+
+    toast.success("Test Sent!");
+  };
   return (
     <>
       <Actions />
@@ -206,16 +243,18 @@ const Home = () => {
                     style={{ color: "#6F6B75" }}
                   >
                     Get fancy messages sent directly to your Discord server when
-                    checkouts are processed or declined.
+                    tasks are completed or failed.
                   </div>
                   <div className='flex flex-row justify-start'>
                     <input
+                      ref={webhook}
                       type='text'
                       className='p-5 rounded-md w-48 h-12 input'
                       style={{ background: "#B584FF" }}
                       placeholder='https://discord.com/api/webhook/'
                     />
                     <button
+                      onClick={testWebhook}
                       className='w-28 h-12 rounded-lg ml-16 '
                       style={{
                         background:
@@ -235,6 +274,7 @@ const Home = () => {
                   2captcha Key
                 </label>
                 <input
+                  ref={twoCap}
                   type='text'
                   style={{ background: "#5A5464" }}
                   className='w-56 h-12 rounded-lg p-4'
@@ -246,12 +286,47 @@ const Home = () => {
                   5sim Key
                 </label>
                 <input
+                  ref={fiveSim}
                   type='text'
                   style={{ background: "#5A5464" }}
                   className='w-56 h-12 rounded-lg p-4'
                   placeholder='Enter 2captcha API key'
                 />
               </div>
+              <div className='flex flex-col mt-12'>
+                <label htmlFor='' className='font-semibold text-xl mb-3'>
+                  Chrome Path
+                </label>
+                <input
+                  ref={chrome}
+                  type='text'
+                  style={{ background: "#5A5464" }}
+                  className='w-56 h-12 rounded-lg p-4'
+                  placeholder='Google chrome file path'
+                />
+              </div>
+              <div className='flex flex-col mt-12'>
+                <label htmlFor='' className='font-semibold text-xl mb-3'>
+                  Gmail Token
+                </label>
+                <input
+                  ref={gmail}
+                  type='text'
+                  style={{ background: "#5A5464" }}
+                  className='w-56 h-12 rounded-lg p-4'
+                  placeholder='Read #guides'
+                />
+              </div>
+              <button
+                onClick={saveSettings}
+                className='w-28 h-12 rounded-lg mt-12 '
+                style={{
+                  background:
+                    "linear-gradient(95.15deg, #9456F1 4.34%, #7F41DD 103.04%)",
+                }}
+              >
+                Save Settings
+              </button>
             </div>
           </div>
         </div>

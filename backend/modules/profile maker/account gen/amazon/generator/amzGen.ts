@@ -11,7 +11,7 @@ import AmazonScanner from "../../../../../utils/gmail scanning/site specific/ama
 import FiveSim from "../../../../../utils/phone/5sim/5sim";
 import Webhook from "../../../../../utils/webhook";
 const numbers = "1234567890";
-import { getProfile } from "../../../index";
+import { getProfile } from "../../../converter/converter_main";
 
 class AmazonGenerator {
   fname;
