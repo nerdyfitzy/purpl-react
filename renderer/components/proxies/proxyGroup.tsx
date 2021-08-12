@@ -104,10 +104,10 @@ const TaskGroup = ({
         </div>
 
         <div
-          className='relative rounded-md w-28 h-10'
+          className='relative right-2 rounded-md p-2 w-28 h-10 min-w-max flex items-center justify-center'
           style={{ background: "#B584FF" }}
         >
-          <div className='my-2 ml-2 align-middle font-medium text-sm'>
+          <div className='my-2 align-middle font-medium text-sm'>
             <svg
               className='float-left mr-2'
               width='20'

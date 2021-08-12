@@ -442,7 +442,7 @@ const aycd = (path) => {
         type: profile.paymentDetails.cardType,
         cnb: profile.paymentDetails.cardNumber,
         month: profile.paymentDetails.cardExpMonth,
-        year: profile.paymentDetails.cardExpYear.substring(1),
+        year: profile.paymentDetails.cardExpYear,
         cvv: profile.paymentDetails.cardCvv,
       },
     };

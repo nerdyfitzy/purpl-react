@@ -92,21 +92,24 @@ const states = [
   { label: "Wyoming", value: "WY" },
 ];
 
-const countries = [{ label: "United States", value: "US" }];
+const countries = [
+  { label: "United States", value: "US" },
+  { label: "United States", value: "US" },
+];
 
 const months = [
-  { label: "January", value: "01" },
-  { label: "February", value: "02" },
-  { label: "March", value: "03" },
-  { label: "April", value: "04" },
-  { label: "May", value: "05" },
-  { label: "June", value: "06" },
-  { label: "July", value: "07" },
-  { label: "August", value: "08" },
-  { label: "September", value: "09" },
-  { label: "October", value: "10" },
-  { label: "November", value: "11" },
-  { label: "December", value: "12" },
+  { label: "01", value: "01" },
+  { label: "02", value: "02" },
+  { label: "03", value: "03" },
+  { label: "04", value: "04" },
+  { label: "05", value: "05" },
+  { label: "06", value: "06" },
+  { label: "07", value: "07" },
+  { label: "08", value: "08" },
+  { label: "09", value: "09" },
+  { label: "10", value: "10" },
+  { label: "11", value: "11" },
+  { label: "12", value: "12" },
 ];
 
 const years = [
@@ -159,6 +162,8 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
       setSZip,
     },
   ] = useContext(inputContext);
+
+  console.log(sState);
   return (
     <>
       <Input
@@ -219,7 +224,7 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
           options={states}
           styles={selectStyles}
           onChange={setSState}
-          inputValue={sState}
+          defaultValue={states.filter((state) => state.label === sState)[0]}
         />
       </div>
       <div className='flex flex-col mr-10'>
@@ -230,7 +235,9 @@ const Shipping = ({ setSame, same }: { setSame: Function; same: boolean }) => {
           options={countries}
           styles={selectStyles}
           onChange={setSCountry}
-          inputValue={sCountry}
+          defaultValue={
+            countries.filter((country) => country.label === sCountry)[0]
+          }
         />
       </div>
       <div className='flex flex-row items-center absolute bottom-11 right-28'>
@@ -317,7 +324,7 @@ const Billing = () => {
           options={states}
           styles={selectStyles}
           onChange={setBState}
-          inputValue={bState}
+          defaultValue={states.filter((state) => state.label === bState)[0]}
         />
       </div>
       <div className='flex flex-col mr-10'>
@@ -328,7 +335,9 @@ const Billing = () => {
           options={countries}
           styles={selectStyles}
           onChange={setBCountry}
-          inputValue={bCountry}
+          defaultValue={
+            countries.filter((country) => country.label === bCountry)[0]
+          }
         />
       </div>
     </>
@@ -348,6 +357,7 @@ const Payment = () => {
       setEmail,
     },
   ] = useContext(inputContext);
+  console.log(expYear);
   return (
     <>
       <Input
@@ -373,8 +383,8 @@ const Payment = () => {
         <Select
           options={months}
           styles={selectStyles}
-          inputValue={expMonth}
           onChange={setExpMonth}
+          defaultValue={months.filter((month) => month.label === expMonth)[0]}
         />
       </div>
       <div className='h-24'></div>
@@ -385,8 +395,8 @@ const Payment = () => {
         <Select
           options={years}
           styles={selectStyles}
-          inputValue={expYear}
           onChange={setExpYear}
+          defaultValue={years.filter((year) => year.label === expYear)[0]}
         />
       </div>
       <div className='h-24'></div>
@@ -568,7 +578,10 @@ const ProfileModal = ({
     };
     if (cardNum.charAt(0) === "5") {
       profile.payment.type = "MasterCard";
-    } else if (cardNum.charAt(0) === "4") {
+    } else if (
+      cardNum.charAt(0) === "4" ||
+      (cardNum.length === 16 && cvv.length === 4)
+    ) {
       profile.payment.type = "Visa";
     } else if (profile.payment.cvv.length === 4) {
       profile.payment.type = "AmericanExpress";
