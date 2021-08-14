@@ -22,7 +22,7 @@ const saveSettings = async (
   var token = "";
   if (gmailToken && oldSettings.misc.authorizedToken === "") {
     console.log("Getting new Token");
-    const scanner = new GmailScanner();
+    const scanner = new GmailScanner(gmailToken);
     token = await scanner.getOauth2();
   }
   const newSettings = {

@@ -6,7 +6,7 @@ import { google } from "googleapis";
 class GmailScanner {
   gmailToken;
   oauth2;
-  constructor() {
+  constructor(token?) {
     const { misc } = JSON.parse(
       fs
         .readFileSync(
@@ -14,7 +14,7 @@ class GmailScanner {
         )
         .toString()
     );
-    this.gmailToken = misc.gmailToken;
+    this.gmailToken = misc.gmailToken === "" ? token : misc.gmailToken;
     this.oauth2 = false;
   }
 
