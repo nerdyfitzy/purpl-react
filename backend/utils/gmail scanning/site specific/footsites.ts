@@ -4,18 +4,19 @@ import * as console from "../../../utils/logger";
 import * as cheerio from "cheerio";
 import fs from "fs";
 import EventEmitter from "events";
+import OrderManager from "../../../modules/analytics/orderManager";
 
 class FootsitesScanner extends GmailScanner {
   lastChecked;
   lastOrder;
   inter;
-  emitter;
+  manager;
   constructor() {
     super();
     this.lastChecked = 0;
     this.lastOrder = "";
     this.inter;
-    this.emitter = new EventEmitter();
+    this.manager = new OrderManager();
   }
 
   scanForOrders() {
@@ -94,7 +95,7 @@ class FootsitesScanner extends GmailScanner {
                     : from.includes("Kids")
                     ? "Kids Footlocker"
                     : "Unknown";
-                  this.emitter.emit("new-footsite-order", {
+                  this.manager.newOrder({
                     specialSku: sku,
                     orderNum,
                     size,

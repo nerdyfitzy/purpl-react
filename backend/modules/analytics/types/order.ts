@@ -17,6 +17,7 @@ export interface Order {
 export interface FormattedOrder {
   site: string;
   sku: string;
+  image: string;
   price: number;
   email: string;
   orderNum: string;
