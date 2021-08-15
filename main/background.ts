@@ -9,6 +9,10 @@ import Tester from "../backend/modules/proxies/tester/test_main";
 import { getSettings, saveSettings } from "../backend/utils/config/editConfig";
 import Webhook from "../backend/utils/webhook";
 import EventEmitter from "events";
+import {
+  getCheckoutGraphData,
+  getOrders,
+} from "../backend/modules/analytics/orderManager";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -308,4 +312,12 @@ ipcMain.on("test-webhook", async (event, hook) => {
 ipcMain.on("get-settings", (event, arg) => {
   const s = getSettings();
   event.returnValue = s;
+});
+
+ipcMain.on("get-new-checkouts", (event, arg) => {
+  event.returnValue = getOrders();
+});
+
+ipcMain.on("get-checkout-graph", (event, arg) => {
+  event.returnValue = getCheckoutGraphData("week");
 });

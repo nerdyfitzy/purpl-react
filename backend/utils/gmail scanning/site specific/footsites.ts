@@ -4,7 +4,7 @@ import * as console from "../../../utils/logger";
 import * as cheerio from "cheerio";
 import fs from "fs";
 import EventEmitter from "events";
-import OrderManager from "../../../modules/analytics/orderManager";
+import { OrderManager } from "../../../modules/analytics/orderManager";
 
 class FootsitesScanner extends GmailScanner {
   lastChecked;
@@ -77,7 +77,6 @@ class FootsitesScanner extends GmailScanner {
                     id: id,
                     format: "full",
                   });
-                  fs.writeFileSync("asdsa.json", JSON.stringify(a));
                   const { value } = a.data.payload.headers.filter(
                     (head) => head.name === "To"
                   )[0];
@@ -103,7 +102,6 @@ class FootsitesScanner extends GmailScanner {
                     email: value,
                     site,
                   });
-                  console.log("Successfully Emit Event");
                 }
               );
             }

@@ -49,9 +49,12 @@ const saveSettings = async (
         : token,
     },
   };
-  fs.writeFileSync(
+  fs.writeFile(
     path.join(process.env.APPDATA, "purpl", "local-data", "config.json"),
-    JSON.stringify(newSettings)
+    JSON.stringify(newSettings),
+    () => {
+      console.log("Saved Settings");
+    }
   );
 };
 

@@ -1,4 +1,5 @@
-import React from "react";
+import { ipcRenderer } from "electron";
+import React, { useEffect, useState } from "react";
 import {
   HorizontalGridLines,
   XYPlot,
@@ -7,19 +8,18 @@ import {
   VerticalBarSeries,
 } from "react-vis";
 
-const testData = [
-  { x: 0, y: 10 },
-  { x: 1, y: 2 },
-  { x: 2, y: 20 },
-  { x: 3, y: 15 },
-  { x: 4, y: 12 },
-  { x: 5, y: 25 },
-  { x: 6, y: 2 },
-];
-
-const days = ["S", "M", "T", "W", "Th", "F", "S"];
+const days = [];
 
 const CheckoutGraph = () => {
+  const [Data, setData] = useState([]);
+  useEffect(() => {
+    setData(ipcRenderer.sendSync("get-checkout-graph"));
+    const date = new Date();
+    for (let i = date.getDate(); i > date.getDate() - 7; i--)
+      days.unshift(`${date.getMonth() + 1}/${i}`);
+
+    console.log(days);
+  }, []);
   return (
     <>
       <div className='div1 rounded-lg flex items-center relative justify-center'>
@@ -46,7 +46,7 @@ const CheckoutGraph = () => {
           <YAxis hideLine style={{ line: { stroke: "#77717F3B" } }} />
           <VerticalBarSeries
             barWidth={0.1}
-            data={testData}
+            data={Data}
             className='rounded-md'
             color='#9456F1'
           />

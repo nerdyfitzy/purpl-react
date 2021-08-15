@@ -22,4 +22,18 @@ export interface FormattedOrder {
   email: string;
   orderNum: string;
   size: string;
+  name: string;
+  date: Date;
+}
+
+interface Date {
+  year: number;
+  month: number;
+  dayOfMonth: number;
+  day: number;
+}
+
+export interface GraphPoint {
+  x: number;
+  y: number;
 }

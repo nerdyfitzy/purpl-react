@@ -1,33 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import {
-  XYPlot,
-  VerticalBarSeries,
-  LineSeries,
-  HorizontalGridLines,
-  VerticalGridLines,
-  XAxis,
-  YAxis,
-  Crosshair,
-} from "react-vis";
 import Actions from "../components/actions";
 import Navbar from "../components/navbar";
 import TopMenu from "../components/topMenu";
-import CreateBtn from "../components/createBtn";
-import TaskGroup from "../components/harvester/taskGroup";
-import Header from "../components/harvester/header";
-import Task from "../components/harvester/task";
 import BottomBar from "../components/bottomBar";
-import ImExC from "../components/importExportCopy";
-import GroupModal from "../components/harvester/groupModal";
 import Purchases from "../components/dashboard/purchaseCounter";
 import Spent from "../components/dashboard/spent";
 import CheckoutGraph from "../components/dashboard/checkoutGraph";
 import ProfitGraph from "../components/dashboard/profitGraph";
 import Calendar from "../components/dashboard/calendar";
 import Checkout from "../components/dashboard/checkout";
-import EventEmitter from "events";
+import { Order } from "../public/types/analytics";
+import { ipcRenderer } from "electron";
 
 //this is the harvester for now just to get the hang of it
 
@@ -47,7 +32,19 @@ const gradient = {
 };
 
 function Home() {
-  useEffect(() => {});
+  const [Checkouts, setCheckouts] = useState<Array<Order>>([]);
+  useEffect(() => {
+    setCheckouts(ipcRenderer.sendSync("get-new-checkouts"));
+    const inter = setInterval(() => {
+      setCheckouts(ipcRenderer.sendSync("get-new-checkouts"));
+
+      console.log(Checkouts);
+    }, 30000);
+
+    return () => {
+      clearInterval(inter);
+    };
+  }, []);
   const isUp = () => {
     return (
       <svg
@@ -106,22 +103,14 @@ function Home() {
                 Latest Checkouts
               </div>
               <div className='flex flex-col relative scrollbars h-4/6'>
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
-                <Checkout />
+                {Checkouts.map((order) => (
+                  <Checkout
+                    image={order.image}
+                    name={order.name}
+                    site={order.site}
+                    key={Checkouts.indexOf(order)}
+                  />
+                ))}
               </div>
             </div>
           </div>

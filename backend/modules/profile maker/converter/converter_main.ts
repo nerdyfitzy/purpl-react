@@ -104,11 +104,17 @@ const fileExtensions = {
 };
 
 const saveProfiles = async () => {
-  fs.writeFileSync(
+  fs.writeFile(
     path.join(process.env.APPDATA, "purpl", "local-data", "profiles.json"),
-    JSON.stringify(groups)
+    JSON.stringify(groups),
+    () => {
+      console.log(
+        `[${new Date().toLocaleTimeString()}] - Saved Profiles!`,
+        "info"
+      );
+    }
   );
-  console.log(`[${new Date().toLocaleTimeString()}] - Saved Profiles!`, "info");
+
   return;
 };
 

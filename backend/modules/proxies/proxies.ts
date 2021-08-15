@@ -124,11 +124,17 @@ const getAll = () => {
 };
 
 const saveProxies = async () => {
-  fs.writeFileSync(
+  fs.writeFile(
     path.join(process.env.APPDATA, "purpl", "local-data", "proxies.json"),
-    JSON.stringify(groups)
+    JSON.stringify(groups),
+    () => {
+      console.log(
+        `[${new Date().toLocaleTimeString()}] - Wrote proxies`,
+        "info"
+      );
+    }
   );
-  console.log(`[${new Date().toLocaleTimeString()}] - Wrote proxies`, "info");
+
   return;
 };
 
