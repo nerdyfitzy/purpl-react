@@ -37,6 +37,7 @@ class OrderManager {
           orderNum: orderInfo.orderNum,
           size: orderInfo.size,
         };
+        //send that to frontend
         break;
       }
     }
