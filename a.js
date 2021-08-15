@@ -1,2 +1,1 @@
-const l = "6394632360485362";
-console.log(l.length);
+console.log("55088701".slice(0, -3) + "-" + "55088701".slice(-3));

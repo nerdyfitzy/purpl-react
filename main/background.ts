@@ -8,6 +8,7 @@ import Proxies from "../backend/modules/proxies/index";
 import Tester from "../backend/modules/proxies/tester/test_main";
 import { getSettings, saveSettings } from "../backend/utils/config/editConfig";
 import Webhook from "../backend/utils/webhook";
+import EventEmitter from "events";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -77,6 +78,11 @@ ipcMain.on(
     event.returnValue = newGmail;
   }
 );
+
+const e = new EventEmitter();
+e.on("new-footsite-order", ({ sku, orderNum, size, price, email, site }) => {
+  console.log("new order", sku, orderNum, email, size, price, site);
+});
 
 ipcMain.on("start-all-gmails", (event, group) => {
   GmailFarmer.startAll(group);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import {
@@ -27,6 +27,7 @@ import CheckoutGraph from "../components/dashboard/checkoutGraph";
 import ProfitGraph from "../components/dashboard/profitGraph";
 import Calendar from "../components/dashboard/calendar";
 import Checkout from "../components/dashboard/checkout";
+import EventEmitter from "events";
 
 //this is the harvester for now just to get the hang of it
 
@@ -46,6 +47,7 @@ const gradient = {
 };
 
 function Home() {
+  useEffect(() => {});
   const isUp = () => {
     return (
       <svg

@@ -7,6 +7,7 @@ import * as console from "./utils/logger";
 import { ipcRenderer } from "electron";
 import { machineId } from "node-machine-id";
 import { saveSettings } from "./utils/config/editConfig";
+import FootsitesScanner from "./utils/gmail scanning/site specific/footsites";
 
 let authenticated = false;
 const clientId = "785264365963182121";
@@ -103,6 +104,8 @@ const startSocket = () => {
 
 const setup = () => {
   return new Promise(async (resolve, reject) => {
+    const f = new FootsitesScanner();
+    f.scanForOrders();
     startSocket();
     if (
       !fs.existsSync(path.join(process.env.APPDATA, "purpl", "local-data")) ||

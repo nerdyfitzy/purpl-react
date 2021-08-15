@@ -1,8 +1,19 @@
-const got = require("got");
-const fs = require("fs");
-const { addItem } = require("../inventory");
+import got from "got";
+import fs from "fs";
 
-const search = async (query) => {
+interface Hit {
+  name: string;
+  img: string;
+  url: string;
+  sku: string;
+  price: number;
+  stockXsku: number;
+  release: string;
+  color: string;
+  product_category: string;
+}
+
+const search = async (query): Promise<Array<Hit>> => {
   let res = await got.post(
     "https://xw7sbct9v6-dsn.algolia.net/1/indexes/products/query",
     {
@@ -33,9 +44,10 @@ const search = async (query) => {
       responseType: "json",
     }
   );
-
+  //@ts-ignore
   if (res.body.hits.length === 0) return;
   let products = [];
+  //@ts-ignore
   for (const hit of res.body.hits) {
     products.push({
       name: hit.name,
@@ -52,6 +64,4 @@ const search = async (query) => {
   return products;
 };
 
-module.exports = {
-  search: search,
-};
+export default search;

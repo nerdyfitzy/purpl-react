@@ -51,7 +51,6 @@ const TaskGroup = ({
       }
     );
     if (typeof proxies === "undefined") return;
-    console.log(proxies);
     const newProxies = Object.values(proxies);
 
     changeProxies(newProxies);
