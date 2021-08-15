@@ -33,7 +33,7 @@ class OrderManager {
             "-" +
             orderInfo.specialSku.slice(-3)
         );
-        console.log(answers);
+        console.log(`${answers} ${orderInfo.specialSku}`);
         const sku = answers[0].sku;
         const date = new Date();
         const formattedOrder: FormattedOrder = {

@@ -5,18 +5,23 @@ import * as cheerio from "cheerio";
 import fs from "fs";
 import EventEmitter from "events";
 import { OrderManager } from "../../../modules/analytics/orderManager";
+import path from "path";
 
 class FootsitesScanner extends GmailScanner {
   lastChecked;
   lastOrder;
   inter;
   manager;
+  firstScan;
   constructor() {
     super();
     this.lastChecked = 0;
     this.lastOrder = "";
     this.inter;
     this.manager = new OrderManager();
+    this.firstScan = !fs.existsSync(
+      path.join(process.env.APPDATA, "purpl", "local-data", "orders.json")
+    );
   }
 
   scanForOrders() {
@@ -37,77 +42,86 @@ class FootsitesScanner extends GmailScanner {
           (err, res) => {
             if (err) console.log(err, "error");
             if (res.data.messages) {
-              const id = res.data.messages[0].id;
-              gmail.users.messages.get(
-                {
-                  userId: "me",
-                  id: id,
-                  format: "raw",
-                },
-                async (err, res) => {
-                  if (err) console.log(err, "error");
-                  //@ts-ignore
-                  const b64 = res.data.raw;
-
-                  const html = Buffer.from(b64, "base64").toString("ascii");
-                  const sku = html
-                    .split("<strong>SKU</strong>: ")[1]
-                    .split(" <strong>")[0]
-                    .split(" ")[0]
-                    .trim();
-
-                  const orderNum = html
-                    .split("Order:</strong>")[1]
-                    .split("</font></td>")[0]
-                    .trim();
-
-                  const size = html
-                    .split("Size</strong>: ")[1]
-                    .split("<strong>")[0]
-                    .trim();
-
-                  const price = parseInt(
-                    html
-                      .split("<strong><strong>$")[1]
-                      .split("</strong></strong>")[0]
-                      .trim()
-                  );
-                  const a = await gmail.users.messages.get({
+              for (
+                let i = 0;
+                this.firstScan ? i < res.data.messages.length : i < 1;
+                i++
+              ) {
+                console.log("getting email number " + i);
+                const id = res.data.messages[i].id;
+                gmail.users.messages.get(
+                  {
                     userId: "me",
                     id: id,
-                    format: "full",
-                  });
-                  const { value } = a.data.payload.headers.filter(
-                    (head) => head.name === "To"
-                  )[0];
-                  const from = a.data.payload.headers.filter(
-                    (head) => head.name === "From"
-                  )[0].value;
-                  let site = from.includes("Foot Locker")
-                    ? "Footlocker"
-                    : from.includes("East")
-                    ? "Eastbay"
-                    : from.includes("Foot Action")
-                    ? "Footaction"
-                    : from.includes("Champs")
-                    ? "Champssports"
-                    : from.includes("Kids")
-                    ? "Kids Footlocker"
-                    : "Unknown";
-                  this.manager.newOrder({
-                    specialSku: sku,
-                    orderNum,
-                    size,
-                    price,
-                    email: value,
-                    site,
-                  });
-                }
-              );
+                    format: "raw",
+                  },
+                  async (err, res) => {
+                    if (err) console.log(err, "error");
+                    //@ts-ignore
+                    const b64 = res.data.raw;
+
+                    const html = Buffer.from(b64, "base64").toString("ascii");
+                    const sku = html
+                      .split("<strong>SKU</strong>: ")[1]
+                      .split(" <strong>")[0]
+                      .split(" ")[0]
+                      .trim();
+
+                    const orderNum = html
+                      .split("Order:</strong>")[1]
+                      .split("</font></td>")[0]
+                      .trim();
+
+                    const size = html
+                      .split("Size</strong>: ")[1]
+                      .split("<strong>")[0]
+                      .trim();
+
+                    const price = parseInt(
+                      html
+                        .split("<strong><strong>$")[1]
+                        .split("</strong></strong>")[0]
+                        .trim()
+                    );
+                    const a = await gmail.users.messages.get({
+                      userId: "me",
+                      id: id,
+                      format: "full",
+                    });
+                    const { value } = a.data.payload.headers.filter(
+                      (head) => head.name === "To"
+                    )[0];
+                    const from = a.data.payload.headers.filter(
+                      (head) => head.name === "From"
+                    )[0].value;
+                    let site = from.includes("Foot Locker")
+                      ? "Footlocker"
+                      : from.includes("East")
+                      ? "Eastbay"
+                      : from.includes("Foot Action")
+                      ? "Footaction"
+                      : from.includes("Champs")
+                      ? "Champssports"
+                      : from.includes("Kids")
+                      ? "Kids Footlocker"
+                      : "Unknown";
+                    this.manager.newOrder({
+                      specialSku: sku,
+                      orderNum,
+                      size,
+                      price,
+                      email: value,
+                      site,
+                    });
+                  }
+                );
+              }
+
+              this.firstScan = false;
             }
           }
         );
-      }, 30000);
+      }, 5000);
     });
   }
 
