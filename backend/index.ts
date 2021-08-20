@@ -1,4 +1,4 @@
-import io from "socket.io-client";
+import io, { Manager } from "socket.io-client";
 import DiscordRPC from "discord-rpc";
 import fs from "fs";
 import path from "path";
@@ -8,6 +8,8 @@ import { ipcRenderer } from "electron";
 import { machineId } from "node-machine-id";
 import { saveSettings } from "./utils/config/editConfig";
 import FootsitesScanner from "./utils/gmail scanning/site specific/footsites";
+import Bot from "./utils/webhook scanner/bot";
+import { OrderManager } from "./modules/analytics/orderManager";
 
 let authenticated = false;
 const clientId = "785264365963182121";
@@ -167,6 +169,7 @@ const setup = () => {
             fivesim: "",
             twoCaptcha: "",
             authorizedToken: "",
+            botToken: "",
           },
         })
       );
@@ -175,7 +178,14 @@ const setup = () => {
       path.join(process.env.APPDATA, "purpl", "local-data", "config.json")
     );
     const config = JSON.parse(config_unparsed.toString());
-
+    console.log(config.misc);
+    if (config.misc.botToken !== "") {
+      console.log("Starting Webhook Scanner");
+      const robot = new Bot(config.misc.botToken);
+      robot.start();
+      const manager = new OrderManager();
+      manager.startListener();
+    }
     if (process.env.NODE_ENV === "development") {
       resolve(1);
       return;
