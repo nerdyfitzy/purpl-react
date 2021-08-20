@@ -283,8 +283,8 @@ ipcMain.on("import-profiles", (event, { path, bot }) => {
 
 ipcMain.on(
   "save-settings",
-  (event, { webhook, chrome, gmailToken, fiveSim, twoCap }) => {
-    saveSettings(webhook, chrome, gmailToken, twoCap, fiveSim);
+  (event, { webhook, chrome, gmailToken, fiveSim, twoCap, botToken }) => {
+    saveSettings(webhook, chrome, gmailToken, twoCap, fiveSim, false, botToken);
   }
 );
 

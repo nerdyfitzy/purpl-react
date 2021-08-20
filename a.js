@@ -1,1 +1,1 @@
-console.log("55088701".slice(0, -3) + "-" + "55088701".slice(-3));
+console.log(parseInt("79.78".match(/(\d+)/)[0]));

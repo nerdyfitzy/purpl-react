@@ -26,4 +26,5 @@ export interface Misc {
   fivesim: string;
   twoCaptcha: string;
   authorizedToken: string;
+  botToken: string;
 }

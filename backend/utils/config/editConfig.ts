@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import GmailScanner from "../gmail scanning/auth";
 import * as console from "../../utils/logger";
+import Bot from "../webhook scanner/bot";
+import { OrderManager } from "../../modules/analytics/orderManager";
 
 const saveSettings = async (
   webhook = false,
@@ -9,7 +11,8 @@ const saveSettings = async (
   gmailToken = false,
   twoCaptcha = false,
   fivesim = false,
-  key = false
+  key = false,
+  botToken = false
 ) => {
   console.log("saving settings");
   const oldSettings = JSON.parse(
@@ -24,6 +27,14 @@ const saveSettings = async (
     console.log("Getting new Token");
     const scanner = new GmailScanner(gmailToken);
     token = await scanner.getOauth2();
+  }
+  if (botToken) {
+    console.log("Starting Robot");
+    const robot = new Bot(botToken);
+    robot.start();
+
+    const manager = new OrderManager();
+    manager.startListener();
   }
   const newSettings = {
     global: {
@@ -47,6 +58,9 @@ const saveSettings = async (
       authorizedToken: oldSettings.misc.authorizedToken
         ? oldSettings.misc.authorizedToken
         : token,
+      botToken: oldSettings.misc.botToken
+        ? oldSettings.misc.botToken
+        : botToken,
     },
   };
   fs.writeFile(

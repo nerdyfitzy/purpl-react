@@ -104,8 +104,6 @@ const startSocket = () => {
 
 const setup = () => {
   return new Promise(async (resolve, reject) => {
-    const f = new FootsitesScanner();
-    f.scanForOrders();
     startSocket();
     if (
       !fs.existsSync(path.join(process.env.APPDATA, "purpl", "local-data")) ||

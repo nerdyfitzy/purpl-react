@@ -33,6 +33,7 @@ const Home = () => {
   const fiveSim = useRef(null);
   const chrome = useRef(null);
   const gmail = useRef(null);
+  const bot = useRef(null);
 
   useEffect(() => {
     const { global, misc }: Settings = ipcRenderer.sendSync("get-settings");
@@ -41,6 +42,7 @@ const Home = () => {
     fiveSim.current.value = misc.fivesim;
     chrome.current.value = global.chromePath;
     gmail.current.value = misc.gmailToken;
+    bot.current.value = misc.botToken;
     return () => {};
   }, []);
 
@@ -51,6 +53,7 @@ const Home = () => {
       gmailToken: gmail.current.value,
       fiveSim: fiveSim.current.value,
       twoCap: twoCap.current.value,
+      botToken: bot.current.value,
     });
 
     toast.success("Saved Settings!");
@@ -268,8 +271,8 @@ const Home = () => {
               </div>
             </div>
 
-            <div className='h-full ml-8 w-full relative'>
-              <div className='flex flex-col'>
+            <div className='h-full ml-8 w-full relative bottom-16 flex flex-col flex-wrap'>
+              <div className='flex flex-col max-w-min'>
                 <label htmlFor='' className='font-semibold text-xl mb-3'>
                   2captcha Key
                 </label>
@@ -281,7 +284,7 @@ const Home = () => {
                   placeholder='Enter 2captcha API key'
                 />
               </div>
-              <div className='flex flex-col mt-12'>
+              <div className='flex flex-col mt-8 max-w-min'>
                 <label htmlFor='' className='font-semibold text-xl mb-3'>
                   5sim Key
                 </label>
@@ -293,7 +296,7 @@ const Home = () => {
                   placeholder='Enter 2captcha API key'
                 />
               </div>
-              <div className='flex flex-col mt-12'>
+              <div className='flex flex-col mt-8 max-w-min'>
                 <label htmlFor='' className='font-semibold text-xl mb-3'>
                   Chrome Path
                 </label>
@@ -305,12 +308,24 @@ const Home = () => {
                   placeholder='Google chrome file path'
                 />
               </div>
-              <div className='flex flex-col mt-12'>
+              <div className='flex flex-col mt-8 max-w-min'>
                 <label htmlFor='' className='font-semibold text-xl mb-3'>
                   Gmail Token
                 </label>
                 <input
                   ref={gmail}
+                  type='text'
+                  style={{ background: "#5A5464" }}
+                  className='w-56 h-12 rounded-lg p-4'
+                  placeholder='Read #guides'
+                />
+              </div>
+              <div className='flex flex-col mt-8 max-w-min'>
+                <label htmlFor='' className='font-semibold text-xl mb-3'>
+                  Bot Token
+                </label>
+                <input
+                  ref={bot}
                   type='text'
                   style={{ background: "#5A5464" }}
                   className='w-56 h-12 rounded-lg p-4'

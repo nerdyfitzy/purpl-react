@@ -20,7 +20,7 @@
     "csv-parser": "^3.0.0",
     "d3-shape": "^3.0.1",
     "discord-rpc": "^3.2.0",
-    "discord.js": "^13.1.0",
+    "discord.js": "11.6.3",
     "dotenv": "^10.0.0",
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.0",
