@@ -36,7 +36,8 @@ function Home() {
   useEffect(() => {
     setCheckouts(ipcRenderer.sendSync("get-new-checkouts"));
     const inter = setInterval(() => {
-      setCheckouts(ipcRenderer.sendSync("get-new-checkouts"));
+      const newCheckouts = ipcRenderer.sendSync("get-new-checkouts");
+      if (Checkouts !== newCheckouts) setCheckouts(newCheckouts);
 
       console.log(Checkouts);
     }, 30000);
@@ -98,11 +99,11 @@ function Home() {
                 "linear-gradient(180deg, rgba(48, 43, 54, 0.0621) 0%, rgba(48, 43, 54, 0.23) 100%)",
             }}
           >
-            <div className='relative top-40'>
+            <div className='relative top-40 w-full'>
               <div className='text-2xl font-semibold text-center mb-4'>
                 Latest Checkouts
               </div>
-              <div className='flex flex-col relative scrollbars h-4/6'>
+              <div className='flex flex-col relative scrollbars h-4/6 w-full px-3'>
                 {Checkouts.map((order) => (
                   <Checkout
                     image={order.image}

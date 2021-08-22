@@ -1,11 +1,10 @@
 const got = require("got");
-const console = require("../../../utils/logger");
 const refresh = async (token) => {
-  const res = got.get("https://stockx.com/", {
+  const res = await got.get("https://stockx.com/", {
     searchParams: {
       forceLogin: "true",
       accessToken: token,
-      gaEvent: "Logged%20In",
+      gaEvent: "Logged In",
     },
     headers: {
       accept:

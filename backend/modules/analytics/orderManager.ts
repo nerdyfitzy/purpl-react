@@ -5,6 +5,13 @@ import search from "../profit tracker/stockx/searchProducts";
 import * as console from "../../utils/logger";
 import { emitter } from "../../utils/webhook scanner/bot";
 
+const quarters = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [9, 10, 11],
+];
+
 let orders: Array<FormattedOrder> = fs.existsSync(
   path.join(process.env.APPDATA, "purpl", "local-data", "orders.json")
 )
@@ -23,6 +30,7 @@ class OrderManager {
       orders.filter((order) => order.orderNum === orderInfo.orderNum).length > 0
     )
       return;
+    let stockXurl = "";
     switch (orderInfo.site) {
       case "Footlocker" ||
         "Footaction" ||
@@ -34,8 +42,8 @@ class OrderManager {
             "-" +
             orderInfo.specialSku.slice(-3)
         );
-        console.log(`${answers} ${orderInfo.specialSku}`);
         const sku = answers[0].sku;
+        stockXurl = answers[0].url;
         const date = new Date();
         const formattedOrder: FormattedOrder = {
           site: orderInfo.site,
@@ -61,6 +69,7 @@ class OrderManager {
 
       case "Yeezy Supply": {
         const answers = await search(orderInfo.normalSku);
+        stockXurl = answers[0].url;
         const date = new Date();
         const formattedOrder: FormattedOrder = {
           site: orderInfo.site,
@@ -85,6 +94,7 @@ class OrderManager {
         console.log("site not recognized");
         break;
     }
+
     fs.writeFile(
       path.join(process.env.APPDATA, "purpl", "local-data", "orders.json"),
       JSON.stringify(orders),
@@ -129,4 +139,104 @@ const getCheckoutGraphData = (
   return graph;
 };
 
-export { OrderManager, getOrders, getCheckoutGraphData };
+const getMoneySpentGraph = (
+  timePeriod: "year" | "month" | "quarter"
+): Array<GraphPoint> => {
+  let graph = [
+    { x: 0, y: 0 },
+    { x: 1, y: 0 },
+    { x: 2, y: 0 },
+    { x: 3, y: 0 },
+    { x: 4, y: 0 },
+    { x: 5, y: 0 },
+    { x: 6, y: 0 },
+    { x: 7, y: 0 },
+    { x: 8, y: 0 },
+    { x: 9, y: 0 },
+    { x: 10, y: 0 },
+    { x: 11, y: 0 },
+  ];
+
+  const today = new Date();
+  orders.forEach((order) => {
+    switch (timePeriod) {
+      case "year":
+        graph.splice(today.getMonth() + 1);
+        console.log(`${order.date.month} monf`);
+        if (order.date.year === today.getFullYear())
+          graph[order.date.month].y += order.price;
+        break;
+      case "month":
+        graph.splice(6);
+        if (order.date.month === today.getMonth())
+          graph[Math.round(order.date.dayOfMonth / 5)].y += order.price;
+        break;
+      case "quarter":
+        graph.splice(9);
+        const currentQuarter =
+          today.getMonth() / 3 < 1
+            ? 1
+            : today.getMonth() / 3 >= 1 && today.getMonth() / 3 < 2
+            ? 2
+            : today.getMonth() / 3 >= 2 && today.getMonth() / 3 < 3
+            ? 3
+            : 4;
+        const orderQuarter =
+          order.date.month / 3 < 1
+            ? 1
+            : order.date.month / 3 >= 1 && order.date.month / 3 < 2
+            ? 2
+            : order.date.month / 3 >= 2 && order.date.month / 3 < 3
+            ? 3
+            : 4;
+        if (currentQuarter === orderQuarter)
+          console.log(
+            `rounded ${Math.round(
+              quarters[orderQuarter - 1].indexOf(order.date.month) * 30 -
+                (30 - order.date.dayOfMonth)
+            )}`
+          );
+        console.log(`order q ${orderQuarter}`);
+        console.log(JSON.stringify(order.date));
+        //[6, 7, 8],
+        graph[
+          Math.round(
+            ((quarters[orderQuarter - 1].indexOf(order.date.month) + 1) * 30 -
+              (30 - order.date.dayOfMonth)) /
+              10
+          )
+        ].y += order.price;
+        break;
+    }
+  });
+
+  return graph;
+};
+
+const getItemsPurchased = () => {
+  const today = new Date();
+  return orders.reduce((total, order) => {
+    if (today.getDate() - today.getDay() < order.date.dayOfMonth)
+      return total + 1;
+  }, 0);
+};
+
+const getMoneySpentNumber = () => {
+  const today = new Date();
+  return orders.reduce((total, order) => {
+    if (today.getDate() - today.getDay() < order.date.dayOfMonth)
+      return total + order.price;
+  }, 0);
+};
+
+export {
+  OrderManager,
+  getOrders,
+  getCheckoutGraphData,
+  getMoneySpentGraph,
+  getItemsPurchased,
+  getMoneySpentNumber,
+};
+
+//    1>   1 <= x < 2   2 <= x < 3 3 <= x
+// 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11

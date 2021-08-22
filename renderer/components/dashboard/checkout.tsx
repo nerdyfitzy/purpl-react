@@ -17,17 +17,14 @@ const Checkout = ({
   console.log(image, site, name);
   return (
     <>
-      <div className='flex mb-1 w-52 min-w-min'>
+      <div className='flex mb-1 w-52 min-w-full'>
         <div
           style={imgBg}
           className='h-9 w-9 rounded-lg overflow-x-visible flex items-center justify-center'
         >
           <img src={image} className='h-8 w-12 rounded-md' alt='' />
         </div>
-        <div
-          className='text-sm ml-4 min-w-min'
-          style={{ color: "#FFFFFF", whiteSpace: "nowrap" }}
-        >
+        <div className='text-sm ml-4' style={{ color: "#FFFFFF" }}>
           {name}{" "}
           <div className='' style={{ color: "#6F6B75" }}>
             {site}

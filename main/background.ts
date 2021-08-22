@@ -11,6 +11,9 @@ import Webhook from "../backend/utils/webhook";
 import EventEmitter from "events";
 import {
   getCheckoutGraphData,
+  getItemsPurchased,
+  getMoneySpentGraph,
+  getMoneySpentNumber,
   getOrders,
 } from "../backend/modules/analytics/orderManager";
 
@@ -320,4 +323,16 @@ ipcMain.on("get-new-checkouts", (event, arg) => {
 
 ipcMain.on("get-checkout-graph", (event, arg) => {
   event.returnValue = getCheckoutGraphData("week");
+});
+
+ipcMain.on("get-spent-graph", (event, period) => {
+  event.returnValue = getMoneySpentGraph(period);
+});
+
+ipcMain.on("get-purchase-number", (event, arg) => {
+  event.returnValue = getItemsPurchased();
+});
+
+ipcMain.on("get-money-spent", (event, arg) => {
+  event.returnValue = getMoneySpentNumber();
 });

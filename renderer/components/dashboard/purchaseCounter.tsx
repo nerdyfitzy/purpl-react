@@ -1,6 +1,8 @@
-import React from "react";
+import { ipcRenderer } from "electron";
+import React, { useState, useEffect } from "react";
 
 const Purchases = () => {
+  const [number, setnumber] = useState(0);
   const isUp = () => {
     return (
       <svg
@@ -17,6 +19,14 @@ const Purchases = () => {
         />
       </svg>
     );
+  };
+
+  useEffect(() => {
+    getTotalItems();
+  }, []);
+
+  const getTotalItems = () => {
+    setnumber(ipcRenderer.sendSync("get-purchase-number"));
   };
   return (
     <>
@@ -51,7 +61,7 @@ const Purchases = () => {
         </div>
         <div className=''>
           <div className='text-xl font-semibold flex flex-row items-center'>
-            157
+            {number}
             {isUp()}
           </div>
           <div className='text-sm font-medium' style={{ color: "#6F6B75" }}>

@@ -1,6 +1,15 @@
-import React from "react";
+import { ipcRenderer } from "electron";
+import React, { useState, useEffect } from "react";
 
 const Spent = () => {
+  const [number, setnumber] = useState(0);
+  useEffect(() => {
+    getNumber();
+  }, []);
+
+  const getNumber = () => {
+    setnumber(ipcRenderer.sendSync("get-money-spent"));
+  };
   const isUp = () => {
     return (
       <svg
@@ -43,7 +52,7 @@ const Spent = () => {
 
       <div className=''>
         <div className='text-xl font-semibold flex flex-row items-center'>
-          $10.5k
+          ${number}
           {isUp()}
         </div>
         <div className='text-sm font-medium' style={{ color: "#6F6B75" }}>
