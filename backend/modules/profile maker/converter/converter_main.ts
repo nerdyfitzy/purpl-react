@@ -208,7 +208,7 @@ const aptJigs = ["Unit", "Block", "Num", "A1", "Apt"];
 const jigProfiles = (profiles, options) => {
   const { group, uuids } = profiles;
   for (const id of uuids) {
-    if (options.RANDOM_LETTERS.checked) {
+    if (options.RANDOM_LETTERS.checked === "on") {
       const { amount, position } = options.RANDOM_LETTERS;
       var randomstring = "";
       for (let i = 0; i < amount; i++) {
@@ -223,7 +223,7 @@ const jigProfiles = (profiles, options) => {
           ? randomstring + " " + groups[group].profiles[id].billing.addy1
           : groups[group].profiles[id].billing.addy1 + " " + randomstring;
     }
-    if (options.RANDOM_APT.checked) {
+    if (options.RANDOM_APT.checked === "on") {
       const { position } = options.RANDOM_APT;
       const random = Math.random() * aptJigs.length;
       switch (aptJigs[random]) {
@@ -316,7 +316,7 @@ const jigProfiles = (profiles, options) => {
         }
       }
     }
-    if (options.RANDOM_FNAME) {
+    if (options.RANDOM_FNAME === "on") {
       const lnameShipping =
         groups[group].profiles[id].shipping.name.split(" ")[1];
       const lnameBilling =
@@ -326,7 +326,7 @@ const jigProfiles = (profiles, options) => {
       groups[group].profiles[id].billing.name =
         names({ first: true }) + " " + lnameBilling;
     }
-    if (options.RANDOM_LNAME) {
+    if (options.RANDOM_LNAME === "on") {
       const fnameShipping =
         groups[group].profiles[id].shipping.name.split(" ")[0];
       const fnameBilling =
@@ -336,7 +336,7 @@ const jigProfiles = (profiles, options) => {
       groups[group].profiles[id].billing.name =
         fnameBilling + " " + names({ last: true });
     }
-    if (options.RANDOM_PHONE) {
+    if (options.RANDOM_PHONE === "on") {
       var randomPhoneNumber = "";
       for (let i = 1; i <= 7; i++) {
         randomPhoneNumber += numbers.charAt(
@@ -349,6 +349,19 @@ const jigProfiles = (profiles, options) => {
       groups[group].profiles[id].billing.phone =
         groups[group].profiles[id].billing.phone.substring(0, 3) +
         randomPhoneNumber;
+    }
+
+    if (options.RANDOM_EMAIL.checked === "on") {
+      let randomEmail = "";
+      let randomNumbers = "";
+      for (let i = 1; i <= 4; i++) {
+        randomNumbers += numbers.charAt(Math.random() * (numbers.length - 1));
+      }
+      randomEmail += `${names({ first: true })}${names({
+        last: true,
+      })}${randomNumbers}@${options.RANDOM_EMAIL.catchall}`;
+
+      groups[group].profiles[id].email = randomEmail;
     }
   }
   saveProfiles();

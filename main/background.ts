@@ -16,6 +16,7 @@ import {
   getMoneySpentNumber,
   getOrders,
 } from "../backend/modules/analytics/orderManager";
+import { jigProfiles } from "../backend/modules/profile maker/converter/converter_main";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -335,4 +336,8 @@ ipcMain.on("get-purchase-number", (event, arg) => {
 
 ipcMain.on("get-money-spent", (event, arg) => {
   event.returnValue = getMoneySpentNumber();
+});
+
+ipcMain.on("jig-profiles", (event, { group, selected, options }) => {
+  event.returnValue = jigProfiles({ group, uuids: selected }, options);
 });

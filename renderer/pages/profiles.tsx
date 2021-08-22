@@ -25,6 +25,7 @@ import { ipcRenderer, remote } from "electron";
 import toast from "react-hot-toast";
 import ExportModal from "../components/profiles/exportModal";
 import ImportModal from "../components/profiles/importModal";
+import JigModal from "../components/profiles/jigModal";
 
 //this is the harvester for now just to get the hang of it
 
@@ -50,6 +51,7 @@ function Home() {
   const [showProfModal, changeProfModal] = useState(false);
   const [showExportModal, changeExportModal] = useState(false);
   const [showImportModal, changeImportModal] = useState(false);
+  const [jigModal, setJigModal] = useState(false);
 
   const [groups, changeGroups] = useState<Array<Group>>([]);
   const [currentGroup, setCurrentGroup] = useState<string>("default");
@@ -197,6 +199,27 @@ function Home() {
     console.log(copy);
     setFilteredProfiles(copy);
   };
+  const jigProfiles = (options) => {
+    const jigged: Group = ipcRenderer.sendSync("jig-profiles", {
+      group: currentGroup,
+      selected,
+      options,
+    });
+
+    toast.success(`Jigged ${selected.length} profiles!`);
+
+    const formatted = Object.values(jigged.profiles).map((prof: Prof) => ({
+      uuid: prof.uuid,
+      name: prof.profile_name,
+      address: prof.shipping.addy1,
+      email: prof.email,
+      last4: prof.payment.cnb.substring(prof.payment.cnb.length - 4),
+      type: prof.payment.type,
+    }));
+
+    changeProfiles(formatted);
+    addSelected([]);
+  };
   return (
     <React.Fragment>
       <HotKeys handlers={handlers}>
@@ -206,6 +229,12 @@ function Home() {
           shown={shown}
           handleClose={() => changeVis(false)}
           handleSubmit={addGroup}
+        />
+
+        <JigModal
+          shown={jigModal}
+          handleClose={() => setJigModal(false)}
+          handleSubmit={jigProfiles}
         />
 
         <stateContext.Provider
@@ -391,7 +420,9 @@ function Home() {
 
                 <ContextMenu id='profile'>
                   <MenuItem onClick={copyGroup}>Copy Selected</MenuItem>
-                  <MenuItem>Jig Selected</MenuItem>
+                  <MenuItem onClick={() => setJigModal(true)}>
+                    Jig Selected
+                  </MenuItem>
                   <MenuItem>Move Selected</MenuItem>
                   <MenuItem onClick={deleteSelected}>Delete Selected</MenuItem>
                   <MenuItem>Export Selected</MenuItem>
