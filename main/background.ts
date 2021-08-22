@@ -17,6 +17,7 @@ import {
   getOrders,
 } from "../backend/modules/analytics/orderManager";
 import { jigProfiles } from "../backend/modules/profile maker/converter/converter_main";
+import VCC_Controller from "../backend/modules/profile maker/card gen/vcc_index";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -341,3 +342,18 @@ ipcMain.on("get-money-spent", (event, arg) => {
 ipcMain.on("jig-profiles", (event, { group, selected, options }) => {
   event.returnValue = jigProfiles({ group, uuids: selected }, options);
 });
+
+ipcMain.on(
+  "gen-vcc",
+  async (event, { provider, profileInfo, qty, names, action }) => {
+    const VC = new VCC_Controller(
+      provider,
+      action,
+      profileInfo.profile,
+      profileInfo.group
+    );
+
+    const profs = await VC.startTasks(names, qty);
+    event.reply("vcc-reply", profs);
+  }
+);

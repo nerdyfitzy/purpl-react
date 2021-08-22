@@ -1,5 +1,5 @@
 import names from "node-random-name";
-import { getProfile, newGroup, addProfile, loadProfiles } from "../index";
+import Converter from "../index";
 import Privacy from "./scripts/privacy";
 
 class VCC_Controller {
@@ -7,7 +7,12 @@ class VCC_Controller {
   action;
   profile;
   profileGroup;
-  constructor(service, action, profileId, groupID) {
+  constructor(
+    service: "Privacy",
+    action: "make" | "get",
+    profileId: string,
+    groupID: string
+  ) {
     this.service = service;
     this.action = action;
     this.profile = profileId;
@@ -15,32 +20,33 @@ class VCC_Controller {
   }
 
   async addCardsToProfiles(Cards) {
-    const Profile = await getProfile(this.profile, this.profileGroup);
-    const { uuid } = await newGroup(`${this.service} Import`);
+    const Profile = await Converter.getProfile(this.profile, this.profileGroup);
+    const copiedProfile = { ...Profile };
+    const { uuid } = await Converter.newGroup(`${this.service} Import`);
     Cards.forEach(async (card) => {
-      Profile.profile_name = `${card.name} | ${card.site_locked}`;
-      delete Profile.uuid;
+      copiedProfile.profile_name = `${card.name} | ${card.site_locked}`;
+      delete copiedProfile.uuid;
       const { cardNumber, expMonth, expYear, cvv } = card.cardDetails;
       switch (cardNumber.charAt(0)) {
         case "4":
-          Profile.payment.type = "Visa";
+          copiedProfile.payment.type = "Visa";
           break;
         case "5":
-          Profile.payment.type = "MasterCard";
+          copiedProfile.payment.type = "MasterCard";
           break;
         default:
-          Profile.payment.type = "AmericanExpress";
+          copiedProfile.payment.type = "AmericanExpress";
           break;
       }
-      Profile.payment.cnb = cardNumber;
-      Profile.payment.month = expMonth;
-      Profile.payment.year = expYear;
-      Profile.payment.cvv = cvv;
+      copiedProfile.payment.cnb = cardNumber;
+      copiedProfile.payment.month = expMonth;
+      copiedProfile.payment.year = expYear;
+      copiedProfile.payment.cvv = cvv;
 
-      await addProfile(Profile, uuid);
+      await Converter.addProfile(copiedProfile, uuid);
     });
 
-    const ProfileGroupFinal = await loadProfiles(false, uuid);
+    const ProfileGroupFinal = await Converter.loadProfiles(false, uuid);
 
     return ProfileGroupFinal;
   }

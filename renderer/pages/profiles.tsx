@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import ExportModal from "../components/profiles/exportModal";
 import ImportModal from "../components/profiles/importModal";
 import JigModal from "../components/profiles/jigModal";
+import VCCModal from "../components/profiles/vccModal";
 
 //this is the harvester for now just to get the hang of it
 
@@ -52,6 +53,7 @@ function Home() {
   const [showExportModal, changeExportModal] = useState(false);
   const [showImportModal, changeImportModal] = useState(false);
   const [jigModal, setJigModal] = useState(false);
+  const [vccModal, setvccModal] = useState(false);
 
   const [groups, changeGroups] = useState<Array<Group>>([]);
   const [currentGroup, setCurrentGroup] = useState<string>("default");
@@ -220,6 +222,20 @@ function Home() {
     changeProfiles(formatted);
     addSelected([]);
   };
+
+  const genVCCs = () => {
+    ipcRenderer.on("vcc-reply", (event, profs) => {
+      console.log(profs);
+      changeGroups([
+        ...groups,
+        {
+          name: profs.name,
+          uuid: profs.uuid,
+          total: Object.values(profs.profiles).length,
+        },
+      ]);
+    });
+  };
   return (
     <React.Fragment>
       <HotKeys handlers={handlers}>
@@ -235,6 +251,12 @@ function Home() {
           shown={jigModal}
           handleClose={() => setJigModal(false)}
           handleSubmit={jigProfiles}
+        />
+
+        <VCCModal
+          shown={vccModal}
+          handleClose={() => setvccModal(false)}
+          handleSubmit={genVCCs}
         />
 
         <stateContext.Provider
@@ -290,7 +312,7 @@ function Home() {
                   text='Create Group'
                   handleClick={() => changeVis(true)}
                 />
-                <div className='scrollbars h-4/6'>
+                <div className='scrollbars h-3/5'>
                   <stateContext.Provider value={changeStates}>
                     {groups.map((group) => (
                       <TaskGroup
@@ -321,6 +343,11 @@ function Home() {
                     <CreateBtn
                       text='Add Profile'
                       handleClick={() => changeProfModal(true)}
+                    />
+                    <CreateBtn
+                      text='Generate VCCs'
+                      handleClick={() => setvccModal(true)}
+                      className='rounded-lg h-10 w-36 my-6 ml-2 flex flex-row justify-evenly items-center'
                     />
                     <div
                       className='flex flex-row justify-between border-2 rounded-md h-10 w-48 ml-5'
