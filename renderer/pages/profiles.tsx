@@ -225,7 +225,6 @@ function Home() {
 
   const genVCCs = () => {
     ipcRenderer.on("vcc-reply", (event, profs) => {
-      console.log(profs);
       changeGroups([
         ...groups,
         {

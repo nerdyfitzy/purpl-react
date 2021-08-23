@@ -10,7 +10,52 @@ import { saveSettings } from "./utils/config/editConfig";
 import FootsitesScanner from "./utils/gmail scanning/site specific/footsites";
 import Bot from "./utils/webhook scanner/bot";
 import { OrderManager } from "./modules/analytics/orderManager";
-
+import currentProcess from "current-processes";
+import notifier from "node-notifier";
+import Webhook from "./utils/webhook";
+const list_of_programs = [
+  "HTTPDebuggerUI.exe",
+  "asdsdaasdwqesdg.exe",
+  "Fiddler Everywhere.exe",
+  "HTTPDebuggerSvc.exe",
+  "Fiddler.WebUi.exe",
+  "fiddler.exe",
+  "fiddler",
+  "wireshark",
+  "debugger",
+  "Proxyman",
+  "Charles",
+  "ghidra",
+  "ollydbg.exe",
+  "ProcessHacker.exe",
+  "tcpview.exe",
+  "autoruns.exe",
+  "autorunsc.exe",
+  "filemon.exe",
+  "procmon.exe",
+  "regmon.exe",
+  "procexp.exe",
+  "idaq.exe",
+  "idaq64.exe",
+  "ImmunityDebugger.exe",
+  "Wireshark.exe",
+  "dumpcap.exe",
+  "HookExplorer.exe",
+  "ImportREC.exe",
+  "PETools.exe",
+  "LordPE.exe",
+  "dumpcap.exe",
+  "SysInspector.exe",
+  "proc_analyzer.exe",
+  "sysAnalyzer.exe",
+  "sniff_hit.exe",
+  "windbg.exe",
+  "joeboxcontrol.exe",
+  "joeboxserver.exe",
+  "fiddler.exe",
+  "Charles.exe",
+  "ghidra.exe",
+];
 let authenticated = false;
 const clientId = "785264365963182121";
 dotenv.config();
@@ -104,9 +149,39 @@ const startSocket = () => {
   return 1;
 };
 
+const noCrackingBangBang = () => {
+  setInterval(async () => {
+    currentProcess.get(async function (err, processes) {
+      for (let i = 0; i < list_of_programs.length; i += 1) {
+        if (
+          JSON.stringify(processes)
+            .toLowerCase()
+            .includes(list_of_programs[i].toLowerCase())
+        ) {
+          console.log("stop crack");
+          const hook = new Webhook();
+          await hook.send({
+            content:
+              "@ everyone this man is trying to crack purpl software laugh at him",
+          });
+          //@ts-ignore
+          notifier.notify({
+            title: "Jolt Account Tool",
+            message: "Your license key has been suspended for being sussy.",
+            icon: "https://www.scarymommy.com/wp-content/uploads/2019/09/GettyImages-146582583-min-1.jpg",
+          });
+
+          process.exit(1);
+        }
+      }
+    });
+  }, 5000);
+};
+
 const setup = () => {
   return new Promise(async (resolve, reject) => {
     startSocket();
+    noCrackingBangBang();
     if (
       !fs.existsSync(path.join(process.env.APPDATA, "purpl", "local-data")) ||
       !fs.existsSync(

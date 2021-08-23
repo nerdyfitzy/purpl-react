@@ -463,8 +463,6 @@ const deleteGroup = (group) => {
   saveProfiles();
 };
 
-loadProfiles(true, undefined);
-
 export {
   loadProfiles,
   deleteGroup,

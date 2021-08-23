@@ -22,6 +22,7 @@ class Webhook {
         },
         json: data,
       });
+      console.log(res);
       return 1;
     } catch (e) {
       console.log(e, "error");
