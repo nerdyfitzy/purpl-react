@@ -13,10 +13,10 @@ class Webhook {
     this.hook = global.webhook;
   }
 
-  async send(data) {
+  async send(data, forcedHook = "") {
     if (this.hook === "") return;
     try {
-      const res = await got.post(this.hook, {
+      const res = await got.post(forcedHook !== "" ? forcedHook : this.hook, {
         headers: {
           "content-type": "application/json",
         },

@@ -7,7 +7,6 @@ const google = require("./activities/google");
 const images = require("./activities/images");
 const subscribe = require("./activities/subscribe");
 const puppeteer = require("puppeteer-extra");
-const console = require("../../utils/logger");
 const stealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(stealth());
 
@@ -380,7 +379,7 @@ const login = async (browser, proxy = "") => {
     try {
       await page.goto("https://accounts.google.com/");
     } catch (e) {
-      if (e.includes("PROXY_CONNECTION_FAILED"))
+      if (e.toString().includes("PROXY_CONNECTION_FAILED"))
         process.stdout.write(
           JSON.stringify({
             id: uuid,

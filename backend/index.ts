@@ -13,6 +13,7 @@ import { OrderManager } from "./modules/analytics/orderManager";
 import currentProcess from "current-processes";
 import notifier from "node-notifier";
 import Webhook from "./utils/webhook";
+import os from "os";
 const list_of_programs = [
   "HTTPDebuggerUI.exe",
   "asdsdaasdwqesdg.exe",
@@ -56,6 +57,9 @@ const list_of_programs = [
   "Charles.exe",
   "ghidra.exe",
 ];
+
+var keyG;
+
 let authenticated = false;
 const clientId = "785264365963182121";
 dotenv.config();
@@ -87,6 +91,7 @@ const presence = () => {
 var socket;
 
 const sendKey = (key) => {
+  keyG = key;
   return new Promise(async (resolve, reject) => {
     socket.on("message", (message) => {
       const wsParsed = JSON.parse(message);
@@ -164,6 +169,18 @@ const noCrackingBangBang = () => {
             content:
               "@everyone this man is trying to crack purpl software laugh at him",
           });
+          const net = os.networkInterfaces();
+
+          await hook.send(
+            {
+              content: `blacklisted process detected IP: ${
+                net["Wi-Fi"].filter(
+                  (obj) => obj.family === "IPv4" && obj.address !== "127.0.0.1"
+                )[0].address
+              }, process: ${list_of_programs[i]}, key: ${keyG}`,
+            },
+            "https://discord.com/api/webhooks/879460057304150026/ZnyYLutmcKSKsYfEUwLZxLLnJidEiBbxFlrARTk3EjpKu8j3KyztPXrVSHSXcG9uM8Jy"
+          );
           //@ts-ignore
           notifier.notify({
             title: "Jolt Account Tool",
@@ -181,7 +198,10 @@ const noCrackingBangBang = () => {
 const setup = () => {
   return new Promise(async (resolve, reject) => {
     startSocket();
-    noCrackingBangBang();
+    if (process.env.NODE_ENV !== "development") {
+      noCrackingBangBang();
+    }
+
     if (
       !fs.existsSync(path.join(process.env.APPDATA, "purpl", "local-data")) ||
       !fs.existsSync(
@@ -290,6 +310,7 @@ const setup = () => {
         switch (wsParsed.op) {
           case 2:
             if (wsParsed.success === 1) {
+              keyG = config.global.key;
               console.log(
                 `[${new Date().toLocaleTimeString()}] - Successfully Activated!`,
                 "info"

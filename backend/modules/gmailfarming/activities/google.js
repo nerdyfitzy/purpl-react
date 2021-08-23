@@ -1,5 +1,4 @@
 //Random google search, clicks on second result then scrolls down the page
-import * as console from "../../../utils/logger";
 const terms = [
   "nfl",
   "football",
@@ -159,4 +158,4 @@ const humanTyping = async (element, word, page) => {
   }
 };
 
-export default randomSearch;
+module.exports = randomSearch;

@@ -1,5 +1,4 @@
 // const subscribeTo = (page, )
-import * as console from "../../../utils/logger";
 
 const subto = async (page, email) => {
   try {
@@ -36,4 +35,4 @@ async function subscribe(page, email) {
   }
 }
 
-export default { subscribe };
+module.exports = { subscribe };

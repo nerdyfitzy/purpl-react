@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const console = require("../../../utils/logger.ts");
 const terms = [
   "nfl",
   "football",

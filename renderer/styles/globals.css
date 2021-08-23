@@ -1,5 +1,5 @@
 @tailwind base;
-
+@import "~react-vis/dist/style";
 /* Write your own custom base styles here */
 
 /* Start purging... */

@@ -1,4 +1,3 @@
-import * as console from "../../../utils/logger";
 const terms = [
   "nfl",
   "football",
@@ -116,4 +115,4 @@ const scrollTo = async (x, y, page) => {
   );
 };
 
-export default { images };
+module.exports = { images };

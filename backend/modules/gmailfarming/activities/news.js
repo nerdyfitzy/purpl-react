@@ -1,5 +1,3 @@
-import * as console from "../../../utils/logger";
-
 async function readNews(page, browser) {
   try {
     let articles = Math.floor(Math.random() * 5 + 5);
@@ -48,4 +46,4 @@ const autoScroll = async (page) => {
   });
 };
 
-export default { readNews };
+module.exports = { readNews };

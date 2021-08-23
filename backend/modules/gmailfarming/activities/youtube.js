@@ -24,7 +24,6 @@ const terms = [
   "tiktok buss it",
   "tiktok big bank",
 ];
-const console = require("../../../utils/logger");
 
 async function travelToYoutube(page) {
   try {
@@ -205,4 +204,4 @@ const checktime = async (page, time) => {
   }
 };
 
-export default { watchYT };
+module.exports = { watchYT };
