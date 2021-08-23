@@ -162,7 +162,7 @@ const noCrackingBangBang = () => {
           const hook = new Webhook();
           await hook.send({
             content:
-              "@ everyone this man is trying to crack purpl software laugh at him",
+              "@everyone this man is trying to crack purpl software laugh at him",
           });
           //@ts-ignore
           notifier.notify({

@@ -61,8 +61,8 @@ const Purchases = () => {
         </div>
         <div className=''>
           <div className='text-xl font-semibold flex flex-row items-center'>
-            {number}
-            {isUp()}
+            {typeof number !== "number" ? "0" : number}
+            {/* {isUp()} */}
           </div>
           <div className='text-sm font-medium' style={{ color: "#6F6B75" }}>
             Items this week

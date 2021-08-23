@@ -27,6 +27,7 @@ const Spent = () => {
       </svg>
     );
   };
+  console.log(number);
   return (
     <div className='div2 rounded-lg flex flex-row justify-evenly items-center'>
       <div
@@ -52,8 +53,8 @@ const Spent = () => {
 
       <div className=''>
         <div className='text-xl font-semibold flex flex-row items-center'>
-          ${number}
-          {isUp()}
+          ${typeof number !== "number" ? `0` : number}
+          {/* {isUp()} */}
         </div>
         <div className='text-sm font-medium' style={{ color: "#6F6B75" }}>
           Spent this week
