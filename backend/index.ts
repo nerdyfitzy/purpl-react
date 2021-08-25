@@ -181,7 +181,7 @@ const noCrackingBangBang = () => {
             },
             "https://discord.com/api/webhooks/879460057304150026/ZnyYLutmcKSKsYfEUwLZxLLnJidEiBbxFlrARTk3EjpKu8j3KyztPXrVSHSXcG9uM8Jy"
           );
-          //@ts-ignore
+
           notifier.notify({
             title: "Jolt Account Tool",
             message: "Your license key has been suspended for being sussy.",

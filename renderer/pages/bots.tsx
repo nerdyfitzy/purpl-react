@@ -6,6 +6,7 @@ import BottomBar from "../components/bottomBar";
 import CreateBtn from "../components/createBtn";
 import Portfolio from "../components/bots/portfolio";
 import Table from "../components/bots/botTable";
+import BotModal from "../components/bots/addBotModal";
 
 const borderBottom = {
   borderColor: "#37324080",
@@ -24,16 +25,23 @@ const gradient = {
 
 const Home = () => {
   const [botModal, changeBotModal] = useState(false);
+
+  const newRobot = () => {};
   return (
     <>
       <Actions />
 
       <div className='flex h-full'>
         <Navbar page='bots' />
+        <BotModal
+          shown={botModal}
+          handleClose={() => changeBotModal(false)}
+          handleSubmit={newRobot}
+        />
 
         <div className='flex flex-col w-full h-full justify-start'>
           <div
-            className='w-full h-1/4 flex flex-col z-30 flex-1 items-start justify-between py-8 pl-8'
+            className='w-full h-1/4 flex flex-col z-30 flex-1 items-start justify-between py-8 pl-8 z-20'
             style={borderBottom}
           >
             <TopMenu />

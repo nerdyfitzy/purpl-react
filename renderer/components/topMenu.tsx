@@ -2,7 +2,7 @@ import React from "react";
 
 const TopMenu = () => {
   return (
-    <div className='flex flex-row justify-between items-center w-11/12'>
+    <div className='flex flex-row justify-between items-center w-11/12 '>
       <div className='flex flex-row items-center'>
         <a>
           <svg
