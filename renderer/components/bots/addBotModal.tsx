@@ -272,6 +272,7 @@ const BotModal = ({
   const [name, setName] = useState("");
   const [botName, setbotName] = useState("");
   const [plans, setplans] = useState([]);
+  const [renewalTypes, setrenewalTypes] = useState([]);
   const [suggestions, setsuggestions] = useState([]);
 
   useEffect(() => {
@@ -303,6 +304,15 @@ const BotModal = ({
       newPlans.push({ label: "Renewal", value: "renewal" });
 
     setplans(newPlans);
+    selected.types.Renewal.forEach((type) => {
+      setrenewalTypes([
+        {
+          label: `$${type.amount} / ${type.timePeriod / 30} month${
+            type.timePeriod / 30 > 1 ? "s" : ``
+          }`,
+        },
+      ]);
+    });
   };
   return (
     <>
@@ -343,7 +353,7 @@ const BotModal = ({
             </div>
           </div>
           <div className='modalBottom relative'>
-            <div className='flex flex-row flex-wrap justify-evenly mt-2'>
+            <div className='flex flex-row flex-wrap justify-evenly mt-12'>
               <div className='flex flex-col'>
                 <label htmlFor='groupName' className='mb-3'>
                   Bot Name
@@ -367,9 +377,29 @@ const BotModal = ({
               </div>
               <div className='flex flex-col'>
                 <label htmlFor='groupName' className='mb-3'>
-                  Renewal Type
+                  Renewal Plan
                 </label>
                 <Select styles={selectStyles} options={plans} />
+              </div>
+              <div className='flex flex-col'>
+                <label htmlFor='groupName' className='mb-3'>
+                  Renewal Type
+                </label>
+                <Select styles={selectStyles} options={renewalTypes} />
+              </div>
+              <div className='w-full mb-5'></div>
+
+              <div className='flex flex-col justify-self-center'>
+                <label htmlFor='groupName' className='mb-3'>
+                  Purchase Price
+                </label>
+                <input
+                  id='groupName'
+                  type='text'
+                  className='rounded-lg w-36 h-12 text-left px-4 text-xs font-medium mb-1'
+                  style={{ background: "#6B6476" }}
+                  placeholder='300'
+                />
               </div>
             </div>
 

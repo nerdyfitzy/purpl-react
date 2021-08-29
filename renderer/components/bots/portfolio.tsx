@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import { ipcRenderer } from "electron";
+import React, { useState, useEffect } from "react";
 
 const Portfolio = () => {
-  const [val, setVal] = useState(10000);
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    // const value: number = ipcRenderer.sendSync("get-portfolio-value");
+    setVal(0);
+  }, []);
   const isUp = () => {
     return (
       <svg
