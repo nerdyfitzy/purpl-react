@@ -1,6 +1,7 @@
 export interface Robot {
   bbId?: number;
   types: Types;
+  name: string;
 }
 
 export interface Types {

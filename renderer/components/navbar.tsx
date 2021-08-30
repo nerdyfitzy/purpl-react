@@ -260,7 +260,7 @@ const Navbar = ({ page }: { page: string }) => {
 
           <div className='h-2'></div>
 
-          <Link href='/monitors'>
+          {/* <Link href='/monitors'>
             <a
               className='h-8 flex flex-row items-center'
               style={isSelected("monitors")}
@@ -291,9 +291,9 @@ const Navbar = ({ page }: { page: string }) => {
                 Monitors
               </div>
             </a>
-          </Link>
+          </Link> */}
 
-          <div className='h-2'></div>
+          {/* <div className='h-2'></div> */}
 
           <Link href='/bots'>
             <a
@@ -341,9 +341,9 @@ const Navbar = ({ page }: { page: string }) => {
             </a>
           </Link>
 
-          <div className='h-2'></div>
+          {/* <div className='h-2'></div> */}
 
-          <Link href='/servers'>
+          {/* <Link href='/servers'>
             <a
               className='h-8 flex flex-row items-center'
               style={isSelected("servers")}
@@ -397,7 +397,7 @@ const Navbar = ({ page }: { page: string }) => {
                 Servers
               </div>
             </a>
-          </Link>
+          </Link> */}
 
           <div className='h-2'></div>
 
