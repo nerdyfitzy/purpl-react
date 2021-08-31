@@ -2,8 +2,9 @@ import * as console from "../../utils/logger";
 import got from "got";
 import { Robot, Renewal } from "./types/Bot";
 
-const bots: { [k: string]: Robot } = {
+export const bots: { [k: string]: Robot } = {
   Fuze: {
+    name: "Fuze",
     bbId: 108,
     types: {
       Renewal: [
@@ -16,6 +17,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Ominous: {
+    name: "Ominous",
     bbId: 103,
     types: {
       Renewal: [
@@ -32,6 +34,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Ganesh: {
+    name: "Ganesh",
     bbId: 100,
     types: {
       Renewal: [
@@ -45,6 +48,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Kage: {
+    name: "Kage",
     bbId: 99,
     types: {
       Renewal: [
@@ -57,6 +61,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Dragon: {
+    name: "Dragon",
     bbId: 98,
     types: {
       Renewal: [
@@ -69,6 +74,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   MekAIO: {
+    name: "MekAIO",
     bbId: 97,
     types: {
       Renewal: [
@@ -81,6 +87,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Nebula: {
+    name: "Nebula",
     bbId: 96,
     types: {
       Renewal: [
@@ -93,6 +100,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Velox: {
+    name: "Velox",
     bbId: 91,
     types: {
       Renewal: [
@@ -106,6 +114,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Wrath: {
+    name: "Wrath",
     bbId: 49,
     types: {
       Renewal: [
@@ -118,6 +127,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   MEKPreme: {
+    name: "MEKPreme",
     bbId: 24,
     types: {
       Renewal: [
@@ -130,6 +140,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   SwftAIO: {
+    name: "SwftAIO",
     bbId: 22,
     types: {
       Renewal: [
@@ -142,6 +153,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Polaris: {
+    name: "Polaris",
     bbId: 18,
     types: {
       Renewal: [
@@ -160,6 +172,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   TohruAIO: {
+    name: "TohruAIO",
     bbId: 17,
     types: {
       Renewal: [
@@ -172,6 +185,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Splashforce: {
+    name: "Splashforce",
     bbId: 11,
     types: {
       Renewal: [
@@ -184,6 +198,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Prism: {
+    name: "Prism",
     bbId: 10,
     types: {
       Renewal: [
@@ -196,6 +211,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Balko: {
+    name: "Balko",
     bbId: 8,
     types: {
       Renewal: [
@@ -210,6 +226,7 @@ const bots: { [k: string]: Robot } = {
     },
   },
   Cybersole: {
+    name: "Cybersole",
     bbId: 6,
     types: {
       Renewal: [
@@ -284,7 +301,7 @@ class Bot {
       }
     );
     //@ts-ignore
-    return res.body.price;
+    return JSON.parse(res.body).price;
   }
 }
 

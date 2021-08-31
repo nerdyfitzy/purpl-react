@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain, ipcRenderer } from "electron";
 import serve from "electron-serve";
+import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import GmailFarmer from "../backend/modules/gmailfarming/index";
 import engine from "../backend/index";
@@ -356,4 +357,9 @@ ipcMain.on(
     const profs = await VC.startTasks(names, qty);
     event.reply("vcc-reply", profs);
   }
+);
+
+ipcMain.on(
+  "new-robot",
+  (event, { key, bot, renewalType, renewalInfo, price }) => {}
 );

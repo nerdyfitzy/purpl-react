@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Select from "react-select";
 import toast from "react-hot-toast";
 import { Robot } from "../../../backend/modules/bot vault/types/Bot";
@@ -290,7 +290,10 @@ const BotModal = ({
   const [botName, setbotName] = useState("");
   const [plans, setplans] = useState([]);
   const [renewalTypes, setrenewalTypes] = useState([]);
+  const [selectedPlan, setselectedPlan] = useState({ label: "", value: "" });
   const [suggestions, setsuggestions] = useState([]);
+  const price = useRef(null);
+  const key = useRef(null);
 
   useEffect(() => {
     if (botName !== "") {
@@ -306,8 +309,23 @@ const BotModal = ({
     if (e.target.getAttribute("id") === "modalBackground") handleClose();
   }
   function submitData() {
-    if (!name) return toast.error("Please fill all required fields!");
+    if (
+      !name ||
+      selectedPlan.value !== "" ||
+      price.current.value ||
+      key.current.value ||
+      (selectedPlan.label === "Renewal" && selectedPlan.value !== "")
+    )
+      return toast.error("Please fill all required fields!");
 
+    ipcRenderer.sendSync("new-robot", {
+      key: key.current.value,
+      bot: bots[botName],
+      renewalType: bots[botName].types[selectedPlan.label],
+      renewalInfo:
+        selectedPlan.label === "Lifetime" ? "Lifetime" : selectedPlan.value,
+      price: price.current.value,
+    });
     handleClose();
   }
 
@@ -327,6 +345,7 @@ const BotModal = ({
           label: `$${type.amount} / ${type.timePeriod / 30} month${
             type.timePeriod / 30 > 1 ? "s" : ``
           }`,
+          value: type,
         },
       ]);
     });
@@ -399,7 +418,11 @@ const BotModal = ({
                 <label htmlFor='groupName' className='mb-3'>
                   Renewal Plan
                 </label>
-                <Select styles={selectStyles} options={plans} />
+                <Select
+                  styles={selectStyles}
+                  options={plans}
+                  onChange={setselectedPlan}
+                />
               </div>
               <div className='flex flex-col'>
                 <label htmlFor='groupName' className='mb-3'>
@@ -415,6 +438,7 @@ const BotModal = ({
                 </label>
                 <input
                   id='groupName'
+                  ref={price}
                   type='number'
                   min='0'
                   className='rounded-lg w-36 h-12 text-left px-4 text-xs font-medium mb-1'
@@ -432,6 +456,7 @@ const BotModal = ({
                   className='rounded-lg w-48 h-12 text-left px-4 text-xs font-medium mb-1'
                   style={{ background: "#6B6476" }}
                   placeholder='XXXX-XXXX-XXXX-XXXX'
+                  ref={key}
                 />
               </div>
             </div>
